@@ -1,0 +1,10 @@
+sequenceDiagram
+    participant Att as Attacker (internal foothold)
+    participant SA as Service A
+    participant SB as Service B
+    participant DB as Data Store
+
+    Att->>SA: Compromise low-privilege workload
+    SA->>SB: Call internal API (implicit trust path)
+    SB->>DB: Read sensitive data
+    DB-->>Att: Data exfiltration via lateral movement

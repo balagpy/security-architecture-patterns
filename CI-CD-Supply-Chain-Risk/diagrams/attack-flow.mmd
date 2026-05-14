@@ -1,0 +1,11 @@
+sequenceDiagram
+    participant Att as Attacker
+    participant CI as CI Pipeline
+    participant Reg as Artifact Registry
+    participant CD as Deploy Stage
+
+    Att->>CI: Influence mutable dependency/action
+    CI->>Reg: Publish compromised artifact
+    CD->>Reg: Pull artifact
+    CD-->>CD: No provenance verification
+    CD->>CD: Deploy compromised release

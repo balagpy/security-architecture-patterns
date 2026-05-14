@@ -1,0 +1,15 @@
+flowchart TD
+    U[User Tenant A] --> API[Shared API]
+    API --> AUTH[AuthZ Layer]
+    AUTH --> DAL[Data Access Layer]
+    DAL --> DB[(Shared DB)]
+    API --> CACHE[(Shared Cache)]
+    API --> Q[(Shared Queue)]
+    Q --> W[Worker]
+    W --> DB
+
+    T1[Tenant Context from token claim]
+    T2[Tenant scope must exist on all reads and writes]
+
+    AUTH -. validates .- T1
+    DAL -. enforces .- T2

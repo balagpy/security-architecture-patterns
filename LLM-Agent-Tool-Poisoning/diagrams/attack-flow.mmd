@@ -1,0 +1,12 @@
+sequenceDiagram
+    participant U as User
+    participant R as Retriever
+    participant M as LLM Agent
+    participant G as Policy Guard
+    participant T as Tool
+
+    U->>R: Ask for analysis
+    R-->>M: Returns poisoned content with hidden instructions
+    M->>G: Request high-risk tool call
+    G-->>M: Allow (weak policy)
+    M->>T: Execute risky action

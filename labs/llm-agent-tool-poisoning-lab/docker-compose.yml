@@ -1,0 +1,16 @@
+services:
+  agent-vulnerable:
+    build: ./app
+    environment:
+      - MODE=vulnerable
+      - INSTANCE_NAME=agent-vulnerable
+    ports:
+      - "8501:8000"
+
+  agent-mitigated:
+    build: ./app
+    environment:
+      - MODE=mitigated
+      - INSTANCE_NAME=agent-mitigated
+    ports:
+      - "8502:8000"

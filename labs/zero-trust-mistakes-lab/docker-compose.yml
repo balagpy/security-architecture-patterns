@@ -1,0 +1,46 @@
+services:
+  service-b-vulnerable:
+    build: ./app
+    environment:
+      - ROLE=service-b
+      - MODE=vulnerable
+      - INSTANCE_NAME=service-b-vulnerable
+      - WORKLOAD_TOKEN=trusted-a-token
+    ports:
+      - "8602:8000"
+
+  service-b-mitigated:
+    build: ./app
+    environment:
+      - ROLE=service-b
+      - MODE=mitigated
+      - INSTANCE_NAME=service-b-mitigated
+      - WORKLOAD_TOKEN=trusted-a-token
+    ports:
+      - "8603:8000"
+
+  service-a-to-vuln:
+    build: ./app
+    environment:
+      - ROLE=service-a
+      - MODE=mitigated
+      - INSTANCE_NAME=service-a-to-vuln
+      - SERVICE_B_URL=http://service-b-vulnerable:8000
+      - WORKLOAD_TOKEN=trusted-a-token
+    ports:
+      - "8611:8000"
+    depends_on:
+      - service-b-vulnerable
+
+  service-a-to-mit:
+    build: ./app
+    environment:
+      - ROLE=service-a
+      - MODE=mitigated
+      - INSTANCE_NAME=service-a-to-mit
+      - SERVICE_B_URL=http://service-b-mitigated:8000
+      - WORKLOAD_TOKEN=trusted-a-token
+    ports:
+      - "8612:8000"
+    depends_on:
+      - service-b-mitigated

@@ -1,0 +1,12 @@
+flowchart LR
+    C[Client] --> G[API Gateway]
+    G --> B[Backend Service]
+    G --> S[Security Policy Engine]
+
+    A[Attacker] -. direct path if exposed .-> B
+
+    H1[Forwarded identity headers]
+    H2[Backend must verify provenance]
+
+    G -. injects .- H1
+    B -. enforces .- H2

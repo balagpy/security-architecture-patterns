@@ -1,0 +1,11 @@
+flowchart LR
+    C[Client] --> IdP[Identity Provider]
+    IdP --> C
+    C --> S1[Service A]
+    C --> S2[Service B]
+
+    T1[ID Token: client identity context]
+    T2[Access Token: API authorization context]
+
+    IdP -. issues .- T1
+    IdP -. issues .- T2

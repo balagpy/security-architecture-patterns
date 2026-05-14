@@ -1,0 +1,14 @@
+flowchart LR
+    C[Client] --> G[API Gateway]
+    G --> A1[API Instance A]
+    G --> A2[API Instance B]
+    A1 --> R[(Redis Revocation Store)]
+    A2 --> R
+    IdP[Auth Service / IdP] --> G
+    IdP --> R
+
+    note1[Offline JWT signature validation at each API instance]
+    note2[Revocation state is centralized but read with different freshness]
+
+    A1 -. local stale cache .- note1
+    A2 -. local stale cache .- note2

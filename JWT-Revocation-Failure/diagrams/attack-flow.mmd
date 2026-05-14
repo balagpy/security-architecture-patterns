@@ -1,0 +1,15 @@
+sequenceDiagram
+    participant U as User
+    participant Att as Attacker
+    participant IdP as Auth Service
+    participant APIA as API Instance A (stale)
+    participant APIM as API Mitigated
+    participant Redis as Revocation Store
+
+    U->>IdP: Logout / revoke session
+    IdP->>Redis: Write revoked(jti)
+    Att->>APIA: Replay stolen token immediately
+    APIA-->>Att: Access granted (stale revocation cache)
+    Att->>APIM: Replay same token
+    APIM->>Redis: Sync revocation check
+    APIM-->>Att: 401 revoked

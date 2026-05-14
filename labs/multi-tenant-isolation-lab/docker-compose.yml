@@ -1,0 +1,18 @@
+services:
+  api-vulnerable:
+    build: ./app
+    environment:
+      - INSTANCE_NAME=api-vulnerable
+      - MODE=vulnerable
+      - JWT_SECRET=dev-secret-do-not-use
+    ports:
+      - "8101:8000"
+
+  api-mitigated:
+    build: ./app
+    environment:
+      - INSTANCE_NAME=api-mitigated
+      - MODE=mitigated
+      - JWT_SECRET=dev-secret-do-not-use
+    ports:
+      - "8102:8000"

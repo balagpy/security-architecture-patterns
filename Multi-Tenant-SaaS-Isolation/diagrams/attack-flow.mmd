@@ -1,0 +1,14 @@
+sequenceDiagram
+    participant A as Attacker (Tenant A)
+    participant API as Shared API
+    participant Cache as Shared Cache
+    participant DB as Shared DB
+
+    A->>API: Request invoice id=42
+    API->>Cache: GET invoice:42 (missing tenant namespace)
+    Cache-->>API: Cached object from Tenant B
+    API-->>A: Returns Tenant B invoice
+
+    A->>API: Update id=42 with weak scope check
+    API->>DB: UPDATE invoices SET ... WHERE id=42
+    DB-->>API: Success (cross-tenant write)

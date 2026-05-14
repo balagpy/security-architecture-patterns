@@ -1,0 +1,10 @@
+flowchart LR
+    User[User/Device] --> IdP[Identity + MFA]
+    IdP --> App[App Gateway]
+    App --> SvcA[Service A]
+    SvcA --> SvcB[Service B]
+    SvcB --> DB[(Data Store)]
+
+    Policy[Policy Engine] --> App
+    Policy --> SvcA
+    Policy --> SvcB

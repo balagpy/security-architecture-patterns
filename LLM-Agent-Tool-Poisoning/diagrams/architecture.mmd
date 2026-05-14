@@ -1,0 +1,9 @@
+flowchart LR
+    U[User] --> O[Agent Orchestrator]
+    O --> M[LLM]
+    M --> R[Retriever]
+    R --> E[External Content]
+    M --> P[Tool Policy Guard]
+    P --> T[Tools]
+
+    E -. untrusted instructions embedded in data .-> M

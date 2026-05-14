@@ -1,0 +1,8 @@
+flowchart LR
+    Dev[Developer] --> Repo[Source Repo]
+    Repo --> CI[CI Runner]
+    CI --> Registry[Artifact Registry]
+    Registry --> CD[Deployment System]
+    CD --> Prod[Production]
+
+    Ext[External Actions/Deps] --> CI

@@ -1,0 +1,12 @@
+sequenceDiagram
+    participant U as User Client
+    participant A as Attacker
+    participant S1 as Service A
+    participant S2 as Service B
+
+    U->>S2: Call with token aud=service-b
+    A->>S1: Replay token aud=service-b
+    S1-->>A: Access granted (if audience check is weak)
+
+    A->>S1: Send ID token instead of access token
+    S1-->>A: Access granted (if token-type checks are missing)

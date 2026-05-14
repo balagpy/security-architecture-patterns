@@ -1,0 +1,46 @@
+services:
+  backend-vulnerable:
+    build: ./app
+    environment:
+      - ROLE=backend
+      - INSTANCE_NAME=backend-vulnerable
+      - MODE=vulnerable
+      - GATEWAY_SIGNING_SECRET=gateway-dev-secret
+    ports:
+      - "8201:8000"
+
+  backend-mitigated:
+    build: ./app
+    environment:
+      - ROLE=backend
+      - INSTANCE_NAME=backend-mitigated
+      - MODE=mitigated
+      - GATEWAY_SIGNING_SECRET=gateway-dev-secret
+    ports:
+      - "8202:8000"
+
+  gateway-to-vulnerable:
+    build: ./app
+    environment:
+      - ROLE=gateway
+      - INSTANCE_NAME=gateway-to-vulnerable
+      - MODE=mitigated
+      - BACKEND_URL=http://backend-vulnerable:8000
+      - GATEWAY_SIGNING_SECRET=gateway-dev-secret
+    ports:
+      - "8211:8000"
+    depends_on:
+      - backend-vulnerable
+
+  gateway-to-mitigated:
+    build: ./app
+    environment:
+      - ROLE=gateway
+      - INSTANCE_NAME=gateway-to-mitigated
+      - MODE=mitigated
+      - BACKEND_URL=http://backend-mitigated:8000
+      - GATEWAY_SIGNING_SECRET=gateway-dev-secret
+    ports:
+      - "8212:8000"
+    depends_on:
+      - backend-mitigated

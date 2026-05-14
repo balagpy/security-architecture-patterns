@@ -1,0 +1,47 @@
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  api-a:
+    build: ./app
+    environment:
+      - INSTANCE_NAME=api-a
+      - MODE=vulnerable
+      - REDIS_HOST=redis
+      - JWT_SECRET=dev-secret-do-not-use
+      - ACCESS_TTL_SECONDS=300
+      - REVOCATION_CACHE_TTL_SECONDS=20
+    ports:
+      - "8001:8000"
+    depends_on:
+      - redis
+
+  api-b:
+    build: ./app
+    environment:
+      - INSTANCE_NAME=api-b
+      - MODE=vulnerable
+      - REDIS_HOST=redis
+      - JWT_SECRET=dev-secret-do-not-use
+      - ACCESS_TTL_SECONDS=300
+      - REVOCATION_CACHE_TTL_SECONDS=20
+    ports:
+      - "8002:8000"
+    depends_on:
+      - redis
+
+  api-mitigated:
+    build: ./app
+    environment:
+      - INSTANCE_NAME=api-mitigated
+      - MODE=mitigated
+      - REDIS_HOST=redis
+      - JWT_SECRET=dev-secret-do-not-use
+      - ACCESS_TTL_SECONDS=300
+      - REVOCATION_CACHE_TTL_SECONDS=20
+    ports:
+      - "8003:8000"
+    depends_on:
+      - redis

@@ -1,0 +1,12 @@
+sequenceDiagram
+    participant Att as Attacker
+    participant GW as API Gateway
+    participant BE as Backend Service
+
+    Att->>GW: Valid request (normal path)
+    GW->>BE: Forward with trusted headers
+
+    Att->>BE: Direct request + forged X-Role: admin
+    BE-->>Att: Privileged response (if boundary is weak)
+
+    Note over BE: Mitigated: reject unless trusted caller identity is verified

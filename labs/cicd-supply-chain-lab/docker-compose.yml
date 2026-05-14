@@ -1,0 +1,16 @@
+services:
+  policy-vulnerable:
+    build: ./app
+    environment:
+      - MODE=vulnerable
+      - INSTANCE_NAME=policy-vulnerable
+    ports:
+      - "8401:8000"
+
+  policy-mitigated:
+    build: ./app
+    environment:
+      - MODE=mitigated
+      - INSTANCE_NAME=policy-mitigated
+    ports:
+      - "8402:8000"
