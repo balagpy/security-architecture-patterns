@@ -1,0 +1,31 @@
+flowchart TB
+    subgraph Z1[Boundary 1: Public Edge]
+        C[Client]
+        GW[API Gateway]
+    end
+
+    subgraph Z2[Boundary 2: Internal Service Zone]
+        B1[Backend Service A]
+        B2[Backend Service B]
+    end
+
+    subgraph Z3[Boundary 3: Identity and Policy Plane]
+        SPIFFE[Workload Identity]
+        PDP[Policy Engine]
+    end
+
+    C --> GW
+    GW --> B1
+    GW --> B2
+    SPIFFE --> B1
+    SPIFFE --> B2
+    PDP --> B1
+    PDP --> B2
+
+    R1[Risk: forged identity headers]
+    R2[Risk: direct backend reachability]
+    R3[Risk: policy drift across hops]
+
+    GW -.-> R1
+    B1 -.-> R2
+    PDP -.-> R3

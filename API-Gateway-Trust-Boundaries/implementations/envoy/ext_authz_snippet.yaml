@@ -1,0 +1,8 @@
+http_filters:
+  - name: envoy.filters.http.ext_authz
+    typed_config:
+      "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz
+      grpc_service:
+        envoy_grpc:
+          cluster_name: ext-authz
+      include_peer_certificate: true

@@ -1,0 +1,19 @@
+sequenceDiagram
+    participant C as Client
+    participant SA as Service A
+    participant Policy as Validation Policy
+
+    rect rgb(255,245,245)
+    Note over C,SA: Before mitigation
+    C->>SA: Send access token (aud=service-b)
+    SA->>SA: Signature-only check
+    SA-->>C: 200 allowed
+    end
+
+    rect rgb(245,255,245)
+    Note over C,Policy: After mitigation
+    C->>SA: Send access token (aud=service-b)
+    SA->>Policy: Validate iss/aud/token_use/scope
+    Policy-->>SA: reject audience mismatch
+    SA-->>C: 401 denied
+    end

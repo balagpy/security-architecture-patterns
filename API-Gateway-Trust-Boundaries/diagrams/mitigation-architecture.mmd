@@ -1,0 +1,28 @@
+flowchart LR
+    subgraph Edge[Edge Zone]
+        GW[API Gateway]
+        SIGN[Header Signature Service]
+    end
+
+    subgraph Mesh[Service Mesh Zone]
+        MTLS[mTLS / Workload Identity]
+        B1[Backend Service]
+        AUTHZ[In-service Authorization Check]
+    end
+
+    subgraph Policy[Control Plane]
+        OPA[Policy Engine]
+    end
+
+    C[Client] --> GW
+    GW --> SIGN
+    SIGN --> B1
+    MTLS --> B1
+    B1 --> AUTHZ
+    AUTHZ --> OPA
+
+    NOTE1[Only trusted caller identity accepted]
+    NOTE2[Signed context + freshness validation]
+
+    B1 -.-> NOTE1
+    SIGN -.-> NOTE2

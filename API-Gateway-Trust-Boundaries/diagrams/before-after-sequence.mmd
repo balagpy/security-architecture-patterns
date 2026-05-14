@@ -1,0 +1,19 @@
+sequenceDiagram
+    participant Att as Attacker
+    participant BE as Backend
+    participant GW as Gateway
+
+    rect rgb(255, 245, 245)
+    Note over Att,BE: Before mitigation
+    Att->>BE: Direct call + X-Role: admin
+    BE-->>Att: 200 allowed
+    end
+
+    rect rgb(245, 255, 245)
+    Note over Att,GW: After mitigation
+    Att->>BE: Direct call + forged headers
+    BE-->>Att: 403 untrusted caller
+    Att->>GW: Request via gateway
+    GW->>BE: Signed headers + trusted identity
+    BE-->>GW: 200 allowed (policy-compliant)
+    end

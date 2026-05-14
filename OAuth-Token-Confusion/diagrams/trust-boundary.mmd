@@ -1,0 +1,30 @@
+flowchart TB
+    subgraph B1[Boundary 1: Client to IdP]
+        C[Client App]
+        IDP[Identity Provider]
+    end
+
+    subgraph B2[Boundary 2: Client to Resource Servers]
+        SA[Service A]
+        SB[Service B]
+    end
+
+    subgraph B3[Boundary 3: Token Validation Policy]
+        MW[Validation Middleware]
+        JWKS[JWKS / Issuer Metadata]
+    end
+
+    C --> IDP
+    C --> SA
+    C --> SB
+    SA --> MW
+    SB --> MW
+    MW --> JWKS
+
+    R1[Risk: wrong audience accepted]
+    R2[Risk: ID token used as API token]
+    R3[Risk: issuer/scope drift across services]
+
+    MW -.-> R1
+    MW -.-> R2
+    SA -.-> R3

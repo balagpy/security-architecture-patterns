@@ -1,0 +1,19 @@
+required_claims:
+  - iss
+  - aud
+  - exp
+  - sub
+  - scope
+  - token_use
+
+policies:
+  service_a:
+    audience: service-a
+    token_use: access
+    required_scopes:
+      - read:profile
+  service_b:
+    audience: service-b
+    token_use: access
+    required_scopes:
+      - read:billing

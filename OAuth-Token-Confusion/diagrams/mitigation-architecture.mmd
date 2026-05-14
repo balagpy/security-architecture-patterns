@@ -1,0 +1,23 @@
+flowchart LR
+    C[Client] --> GW[API Gateway]
+    GW --> SA[Service A]
+    GW --> SB[Service B]
+
+    subgraph Policy[Central Validation Policy]
+        VP[Token Validation Profile]
+        AUD[Per-service audience policy]
+        SCOPE[Action-level scope policy]
+    end
+
+    IDP[IdP] --> JWKS[JWKS / Metadata]
+    SA --> VP
+    SB --> VP
+    VP --> JWKS
+    VP --> AUD
+    VP --> SCOPE
+
+    NOTE1[ID token blocked on API routes]
+    NOTE2[Audience mismatch denied]
+
+    VP -.-> NOTE1
+    AUD -.-> NOTE2
