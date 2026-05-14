@@ -8,7 +8,7 @@ This is a governance-to-runtime architecture gap, not a branding issue.
 
 ## System Context
 
-Common enterprise shape:
+Typical enterprise architecture:
 - SSO and MFA at user ingress
 - segmented networks with partial microsegmentation
 - mixed legacy and cloud-native workloads
@@ -93,7 +93,7 @@ Real progress depends on continuous runtime verification, not perimeter declarat
 
 ## Practical Demo
 
-Companion lab:
+Companion demo:
 - [zero-trust-mistakes-lab](../demo/zero-trust-mistakes-lab/README.md)
 
 ## References

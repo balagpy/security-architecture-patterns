@@ -8,7 +8,7 @@ This is not only an auth bug. It is a boundary-design failure between edge, mesh
 
 ## System Context
 
-Typical system:
+Typical system architecture:
 - API gateway performs authentication and coarse authorization
 - gateway forwards identity context (`X-User-Id`, `X-Role`, `X-Tenant-Id`)
 - backend services trust forwarded headers
@@ -96,7 +96,7 @@ The operational lesson is that perimeter enforcement does not replace hop-by-hop
 
 ## Practical Demo
 
-Companion lab:
+Companion demo:
 - [api-gateway-boundary-lab](../demo/api-gateway-boundary-lab/README.md)
 
 ## References

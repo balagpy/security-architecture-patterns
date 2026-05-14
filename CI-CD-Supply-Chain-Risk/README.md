@@ -94,7 +94,7 @@ The practical takeaway is to treat CI/CD as production-critical identity and int
 
 ## Practical Demo
 
-Companion lab:
+Companion demo:
 - [cicd-supply-chain-lab](../demo/cicd-supply-chain-lab/README.md)
 
 ## References

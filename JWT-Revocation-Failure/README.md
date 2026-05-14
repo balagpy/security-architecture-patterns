@@ -8,7 +8,7 @@ This gap is not a cryptographic failure. It is an architecture consistency failu
 
 ## System Context
 
-Typical system shape:
+Typical system architecture:
 - identity provider issues short-lived access tokens and longer-lived refresh tokens
 - API gateway forwards bearer tokens to multiple backend services
 - services validate JWTs locally using issuer keys
@@ -41,7 +41,7 @@ Core components:
 4. Service optionally checks revocation source or local revocation cache.
 5. Access granted.
 
-## Failure Mode
+## Failure Modes
 
 ### Broken Assumption
 
@@ -49,10 +49,10 @@ Core components:
 
 ### Trigger Conditions
 
-- per-instance revocation caches refresh every N seconds
-- network jitter or retries delay revocation propagation
-- services run with fail-open behavior when revocation backend is slow/unavailable
-- mixed fleet behavior during rolling deploys (some instances check denylist, some do not)
+- Per-instance revocation caches refresh every N seconds.
+- Network jitter or retries delay revocation propagation.
+- Services run with fail-open behavior when revocation backend is slow/unavailable.
+- Mixed fleet behavior during rolling deploys (some instances check denylist, some do not).
 
 ### Why It Appears at Scale
 
@@ -88,10 +88,10 @@ Representative replay path:
 
 ## Detection Opportunities
 
-- successful requests using tokens whose `jti` appears in revoke events
-- spikes in post-logout API activity per session or device fingerprint
-- instance-level divergence: one replica rejects while another accepts same token
-- revocation latency SLO breach (time from revoke event to last accepted request)
+- Successful requests using tokens whose `jti` appears in revoke events.
+- Spikes in post-logout API activity per session or device fingerprint.
+- Instance-level divergence: one replica rejects while another accepts the same token.
+- Revocation latency SLO breach (time from revoke event to last accepted request).
 
 ## Mitigation Strategy
 
@@ -101,7 +101,6 @@ High-level direction:
 - reduce revocation window with short-lived access tokens
 - standardize revocation enforcement via central introspection for sensitive routes
 - use push-based invalidation events and strict fail-closed policy for high-risk operations
-
 
 ## Common Anti-Patterns
 
@@ -147,7 +146,7 @@ These incidents are less about JWT format and more about distributed session-sta
 
 ## Practical Demo
 
-Runnable companion lab:
+Runnable companion demo:
 - [jwt-revocation-lab](../demo/jwt-revocation-lab/README.md)
 
 ## References

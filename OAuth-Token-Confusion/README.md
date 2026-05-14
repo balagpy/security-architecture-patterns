@@ -8,7 +8,7 @@ This is a protocol-usage architecture failure, not just a parsing bug.
 
 ## System Context
 
-Typical system:
+Typical system architecture:
 - identity provider issues ID token and access token
 - API gateway or backend validates JWT structure/signature
 - multiple resource servers exist with different audiences/scopes
@@ -94,7 +94,7 @@ The root issue is trust policy ambiguity, not cryptography alone.
 
 ## Practical Demo
 
-Companion lab:
+Companion demo:
 - [oauth-token-confusion-lab](../demo/oauth-token-confusion-lab/README.md)
 
 ## References

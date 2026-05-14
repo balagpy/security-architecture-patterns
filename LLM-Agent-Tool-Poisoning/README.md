@@ -95,7 +95,7 @@ The recurring issue is orchestration trust design, not model capability alone.
 
 ## Practical Demo
 
-Companion lab:
+Companion demo:
 - [llm-agent-tool-poisoning-lab](../demo/llm-agent-tool-poisoning-lab/README.md)
 
 ## References

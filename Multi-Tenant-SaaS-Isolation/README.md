@@ -94,7 +94,7 @@ The recurring theme is control inconsistency across API, cache, worker, and data
 
 ## Practical Demo
 
-Companion lab:
+Companion demo:
 - [multi-tenant-isolation-lab](../demo/multi-tenant-isolation-lab/README.md)
 
 ## References
