@@ -12,6 +12,15 @@ It focuses on:
 - control-plane and software supply-chain risk
 - agentic and zero-trust implementation failures
 
+## Who This Is For
+
+Designed for:
+- Security architects
+- Staff+ engineers
+- Platform security teams
+- Cloud-native engineering teams
+- Security researchers
+
 ## What You Will Find
 
 Each case study is built as a repeatable analysis unit with:
@@ -51,9 +60,12 @@ Each topic directory includes:
 - `README.md`
 - `architecture.svg`
 - `attack-flow.svg`
+- `sequence.svg`
 - `mitigations.md`
 - `references.md`
-- optional `diagrams/*.mmd` sources
+- `diagrams/architecture.mmd`
+- `diagrams/attack-flow.mmd`
+- `diagrams/sequence.mmd`
 
 ## Companion Demos
 

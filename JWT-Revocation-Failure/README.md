@@ -66,7 +66,11 @@ Attackers exploit that timing window.
 
 See `attack-flow.svg` (rendered) and `diagrams/attack-flow.mmd` (source).
 
+See `sequence.svg` (rendered) and `diagrams/sequence.mmd` (source).
+
 ![Attack Flow Diagram](./attack-flow.svg)
+
+![Sequence Diagram](./sequence.svg)
 
 Representative replay path:
 1. Attacker obtains a valid token (stolen device/session leak/log exposure).
@@ -121,6 +125,25 @@ High-level direction:
 2. Inject revocation-store latency and verify deterministic policy behavior.
 3. Test rolling deploy with mixed versions to ensure no bypass paths.
 4. Replay revoked tokens against every public and internal enforcement hop.
+
+## Why Existing Systems Fail
+
+Teams usually do not ignore revocation risk intentionally. They optimize for latency, availability, and developer speed:
+- Offline JWT validation avoids network hops on hot paths.
+- Cache-based revocation checks reduce p99 latency and dependency blast radius.
+- Mixed fleets during deploys create temporary policy asymmetry.
+- Incident response demands immediate revocation, but distributed convergence is not instant.
+
+The result is a predictable consistency gap between control-plane revocation and data-plane acceptance.
+
+## Real Incident Correlation
+
+Patterns in this case align with recurring real-world issues:
+- Stolen bearer tokens replayed before revocation converges across services.
+- Refresh-token abuse extending attacker session lifetime.
+- Session invalidation behaving inconsistently across mobile, web, and API surfaces.
+
+These incidents are less about JWT format and more about distributed session-state coordination.
 
 ## Practical Demo
 

@@ -1,0 +1,12 @@
+sequenceDiagram
+    participant A as Tenant A User
+    participant API
+    participant Cache
+    participant DB
+
+    A->>API: GET /invoice/42
+    API->>Cache: GET invoice:42
+    Cache-->>API: Tenant B object
+    API-->>A: Cross-tenant response leak
+    API->>DB: Later strict query by tenant
+    DB-->>API: Tenant A scoped record

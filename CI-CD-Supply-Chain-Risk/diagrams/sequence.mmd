@@ -1,0 +1,13 @@
+sequenceDiagram
+    participant Dev
+    participant CI
+    participant Ext as External Action
+    participant Reg as Registry
+    participant Deploy
+
+    Dev->>CI: Trigger pipeline
+    CI->>Ext: Pull mutable action tag
+    Ext-->>CI: Compromised behavior
+    CI->>Reg: Publish artifact
+    Deploy->>Reg: Pull artifact
+    Deploy-->>Deploy: Reject if provenance gate enforced

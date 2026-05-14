@@ -1,0 +1,11 @@
+sequenceDiagram
+    participant C as Client
+    participant GW as API Gateway
+    participant BE as Backend
+    participant Att as Attacker
+
+    C->>GW: Authenticated request
+    GW->>BE: Forward trusted identity headers
+    Att->>BE: Direct call + forged X-Role: admin
+    BE-->>Att: Allowed if provenance is unchecked
+    BE-->>Att: Rejected when caller identity is verified

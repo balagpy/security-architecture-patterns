@@ -1,0 +1,11 @@
+sequenceDiagram
+    participant U as Client
+    participant IdP
+    participant SA as Service A
+    participant SB as Service B
+
+    U->>IdP: Request tokens
+    IdP-->>U: ID token + access token(aud=SB)
+    U->>SA: Send token intended for SB
+    SA-->>U: Accepted if audience check is weak
+    SA-->>U: Rejected under strict aud/token-use policy

@@ -1,0 +1,13 @@
+sequenceDiagram
+    participant User
+    participant Agent
+    participant Retriever
+    participant Policy
+    participant Tool
+
+    User->>Agent: Summarize document
+    Agent->>Retriever: Fetch context
+    Retriever-->>Agent: Poisoned instructions
+    Agent->>Policy: Request shell tool call
+    Policy-->>Agent: Deny by intent-tool policy
+    Agent-->>User: Safe fallback / explanation

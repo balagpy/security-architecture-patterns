@@ -48,7 +48,11 @@ See `architecture.svg` (rendered) and `diagrams/architecture.mmd` (source).
 
 See `attack-flow.svg` (rendered) and `diagrams/attack-flow.mmd` (source).
 
+See `sequence.svg` (rendered) and `diagrams/sequence.mmd` (source).
+
 ![Attack Flow Diagram](./attack-flow.svg)
+
+![Sequence Diagram](./sequence.svg)
 
 ## Impact
 
@@ -67,6 +71,25 @@ See `attack-flow.svg` (rendered) and `diagrams/attack-flow.mmd` (source).
 ## Mitigation Strategy
 
 See [mitigations.md](./mitigations.md).
+
+## Why Existing Systems Fail
+
+Zero trust implementations degrade under operational constraints:
+- Strong user auth is deployed first; workload identity lags.
+- Exceptions added during outages become long-lived bypasses.
+- East-west policy rollout is harder than perimeter policy rollout.
+- Legacy services resist mTLS and fine-grained authorization integration.
+
+Programs report policy intent success while runtime enforcement remains uneven.
+
+## Real Incident Correlation
+
+These failure patterns correlate with common enterprise incidents:
+- Lateral movement after initial foothold despite strong SSO/MFA.
+- Internal service abuse through implicit trust paths.
+- Exception-driven access expansion without expiry governance.
+
+Real progress depends on continuous runtime verification, not perimeter declarations.
 
 ## Practical Demo
 

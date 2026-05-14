@@ -49,7 +49,11 @@ See `architecture.svg` (rendered) and `diagrams/architecture.mmd` (source).
 
 See `attack-flow.svg` (rendered) and `diagrams/attack-flow.mmd` (source).
 
+See `sequence.svg` (rendered) and `diagrams/sequence.mmd` (source).
+
 ![Attack Flow Diagram](./attack-flow.svg)
+
+![Sequence Diagram](./sequence.svg)
 
 ## Impact
 
@@ -68,6 +72,25 @@ See `attack-flow.svg` (rendered) and `diagrams/attack-flow.mmd` (source).
 ## Mitigation Strategy
 
 See [mitigations.md](./mitigations.md).
+
+## Why Existing Systems Fail
+
+Tenant isolation failures often emerge from scale and product pressure:
+- Shared infrastructure is chosen to control cost and simplify operations.
+- Teams introduce caches and async workers before tenant-context controls are fully standardized.
+- One unscoped query path can bypass an otherwise strong model.
+- Legacy service contracts preserve mutable headers and weak context propagation.
+
+Isolation erodes gradually unless boundaries are enforced by default in data and policy layers.
+
+## Real Incident Correlation
+
+This pattern maps to well-known classes of incidents:
+- Cross-tenant data leakage from cache-key collisions.
+- Mis-scoped data access due to missing tenant predicates.
+- Cloud IAM or policy misconfiguration exposing one tenant’s data to another.
+
+The recurring theme is control inconsistency across API, cache, worker, and data paths.
 
 ## Practical Demo
 

@@ -1,0 +1,12 @@
+sequenceDiagram
+    participant Att as Attacker Foothold
+    participant SvcA as Service A
+    participant SvcB as Service B
+    participant Policy
+
+    Att->>SvcA: Compromise low-trust workload
+    SvcA->>SvcB: Internal API call
+    SvcB-->>SvcA: Allowed under implicit trust
+    SvcB->>Policy: Verify workload identity
+    Policy-->>SvcB: Deny untrusted caller
+    SvcB-->>Att: Access blocked

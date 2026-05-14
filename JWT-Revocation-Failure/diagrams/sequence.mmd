@@ -1,0 +1,13 @@
+sequenceDiagram
+    participant User
+    participant IdP as Auth Service
+    participant Redis as Revocation Store
+    participant API as API Instance
+    participant Att as Attacker
+
+    User->>IdP: Logout / revoke session
+    IdP->>Redis: revoked(jti)=true
+    Att->>API: Replay old token
+    API-->>Att: Allowed during stale window
+    API->>Redis: Refresh/check revocation
+    API-->>Att: Rejected after convergence

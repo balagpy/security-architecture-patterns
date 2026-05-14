@@ -51,7 +51,11 @@ See `architecture.svg` (rendered) and `diagrams/architecture.mmd` (source).
 
 See `attack-flow.svg` (rendered) and `diagrams/attack-flow.mmd` (source).
 
+See `sequence.svg` (rendered) and `diagrams/sequence.mmd` (source).
+
 ![Attack Flow Diagram](./attack-flow.svg)
+
+![Sequence Diagram](./sequence.svg)
 
 ## Impact
 
@@ -70,6 +74,25 @@ See `attack-flow.svg` (rendered) and `diagrams/attack-flow.mmd` (source).
 ## Mitigation Strategy
 
 See [mitigations.md](./mitigations.md).
+
+## Why Existing Systems Fail
+
+Gateway trust assumptions break for practical reasons:
+- Internal services are exposed temporarily for debugging or migration.
+- Backend teams rely on forwarded headers to avoid duplicate auth logic.
+- Service ownership boundaries create uneven rollout of caller-identity verification.
+- Legacy east-west paths remain reachable after perimeter hardening.
+
+The architecture looks secure at the edge while internal trust paths remain forgeable.
+
+## Real Incident Correlation
+
+Common breach patterns correlate with this design failure:
+- Internal API endpoints reachable from unintended network paths.
+- Header spoofing and confused deputy scenarios in service-to-service calls.
+- SSRF pivots that bypass edge controls and hit trusted internal interfaces.
+
+The operational lesson is that perimeter enforcement does not replace hop-by-hop trust verification.
 
 ## Practical Demo
 

@@ -50,7 +50,11 @@ See `architecture.svg` (rendered) and `diagrams/architecture.mmd` (source).
 
 See `attack-flow.svg` (rendered) and `diagrams/attack-flow.mmd` (source).
 
+See `sequence.svg` (rendered) and `diagrams/sequence.mmd` (source).
+
 ![Attack Flow Diagram](./attack-flow.svg)
+
+![Sequence Diagram](./sequence.svg)
 
 ## Impact
 
@@ -69,6 +73,25 @@ See `attack-flow.svg` (rendered) and `diagrams/attack-flow.mmd` (source).
 ## Mitigation Strategy
 
 See [mitigations.md](./mitigations.md).
+
+## Why Existing Systems Fail
+
+Agent systems fail when safety and utility are tuned independently:
+- Teams optimize tool autonomy before strict intent-policy mapping.
+- Retrieved untrusted text is blended with instruction context.
+- Broad tool scopes are granted to reduce human handoff latency.
+- Logging captures outputs but not decision provenance.
+
+Without explicit trust-tier controls, convenience paths become exploit paths.
+
+## Real Incident Correlation
+
+Observed incidents and public red-team findings commonly involve:
+- Prompt injection causing unintended tool invocation.
+- Data exfiltration attempts via plugin/tool channels.
+- Agent workflow hijack through untrusted retrieval content.
+
+The recurring issue is orchestration trust design, not model capability alone.
 
 ## Practical Demo
 

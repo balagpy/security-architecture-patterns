@@ -49,7 +49,11 @@ See `architecture.svg` (rendered) and `diagrams/architecture.mmd` (source).
 
 See `attack-flow.svg` (rendered) and `diagrams/attack-flow.mmd` (source).
 
+See `sequence.svg` (rendered) and `diagrams/sequence.mmd` (source).
+
 ![Attack Flow Diagram](./attack-flow.svg)
+
+![Sequence Diagram](./sequence.svg)
 
 ## Impact
 
@@ -68,6 +72,25 @@ See `attack-flow.svg` (rendered) and `diagrams/attack-flow.mmd` (source).
 ## Mitigation Strategy
 
 See [mitigations.md](./mitigations.md).
+
+## Why Existing Systems Fail
+
+Token confusion typically appears during rapid multi-service growth:
+- Shared middleware validates signature but omits strict token-intent checks.
+- Teams reuse audiences across services for convenience.
+- Backward compatibility keeps permissive token acceptance paths alive.
+- Policy ownership is split between identity and application teams.
+
+This creates acceptance ambiguity that attackers can replay across services.
+
+## Real Incident Correlation
+
+Industry incidents repeatedly show:
+- Access tokens replayed against unintended resources.
+- ID token misuse where API authorization required access tokens.
+- Scope and audience drift across service boundaries.
+
+The root issue is trust policy ambiguity, not cryptography alone.
 
 ## Practical Demo
 

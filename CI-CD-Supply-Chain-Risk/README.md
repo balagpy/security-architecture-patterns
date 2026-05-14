@@ -49,7 +49,11 @@ See `architecture.svg` (rendered) and `diagrams/architecture.mmd` (source).
 
 See `attack-flow.svg` (rendered) and `diagrams/attack-flow.mmd` (source).
 
+See `sequence.svg` (rendered) and `diagrams/sequence.mmd` (source).
+
 ![Attack Flow Diagram](./attack-flow.svg)
+
+![Sequence Diagram](./sequence.svg)
 
 ## Impact
 
@@ -68,6 +72,25 @@ See `attack-flow.svg` (rendered) and `diagrams/attack-flow.mmd` (source).
 ## Mitigation Strategy
 
 See [mitigations.md](./mitigations.md).
+
+## Why Existing Systems Fail
+
+Pipeline risk grows from delivery pressure and trust transitivity:
+- Mutable CI action references are faster to maintain than pinned SHAs.
+- Broad tokens simplify automation but increase blast radius.
+- Artifact verification is deferred to speed release cadence.
+- Third-party integrations accumulate without uniform risk gates.
+
+Pipelines become high-trust control planes with low-friction compromise paths.
+
+## Real Incident Correlation
+
+This case aligns with major supply-chain events and patterns:
+- CircleCI incident (session/token exposure impact across customers).
+- SolarWinds build-chain compromise pattern.
+- Codecov script tampering and secret-exposure pattern.
+
+The practical takeaway is to treat CI/CD as production-critical identity and integrity infrastructure.
 
 ## Practical Demo
 
