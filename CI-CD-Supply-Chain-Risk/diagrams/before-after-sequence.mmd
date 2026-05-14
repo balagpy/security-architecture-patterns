@@ -1,0 +1,23 @@
+sequenceDiagram
+    participant Dev
+    participant CI
+    participant Reg as Registry
+    participant Deploy
+
+    rect rgb(255,245,245)
+    Note over Dev,Deploy: Before mitigation
+    Dev->>CI: Workflow uses action@v1
+    CI->>Reg: Build + push unsigned artifact
+    Deploy->>Reg: Pull artifact
+    Deploy-->>Deploy: Deploy without provenance check
+    end
+
+    rect rgb(245,255,245)
+    Note over Dev,Deploy: After mitigation
+    Dev->>CI: Workflow uses action@<commit SHA>
+    CI->>CI: Policy gate validates workflow + permissions
+    CI->>Reg: Push signed artifact + attestation
+    Deploy->>Reg: Pull artifact
+    Deploy->>Deploy: Verify signature/provenance
+    Deploy-->>Deploy: Deploy only if valid
+    end

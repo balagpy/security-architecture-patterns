@@ -1,0 +1,18 @@
+flowchart LR
+    REPO[Repository] --> CI[CI Pipeline]
+    CI --> SCAN[Policy + Dependency Scan]
+    CI --> SIGN[Artifact Signing]
+    SIGN --> REG[Artifact Registry]
+    REG --> VERIFY[Provenance Verification Gate]
+    VERIFY --> CD[Deploy Pipeline]
+    CD --> PROD[Production]
+
+    PIN[Immutable Action Pinning] --> CI
+    LEAST[Least-Privilege Tokens] --> CI
+    EPH[Ephemeral Runner Controls] --> CI
+
+    NOTE1[Only signed/proven artifacts can deploy]
+    NOTE2[Workflow drift blocked by policy gate]
+
+    VERIFY -.-> NOTE1
+    SCAN -.-> NOTE2

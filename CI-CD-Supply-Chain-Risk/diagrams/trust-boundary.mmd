@@ -1,0 +1,33 @@
+flowchart TB
+    subgraph T1[Boundary 1: Source Control]
+        DEV[Developer]
+        REPO[Repository]
+    end
+
+    subgraph T2[Boundary 2: CI Execution]
+        CI[CI Runner]
+        ACT[Third-party Actions]
+        DEP[Dependencies]
+    end
+
+    subgraph T3[Boundary 3: Artifact and Deploy]
+        REG[Artifact Registry]
+        CD[Deploy Pipeline]
+        PROD[Production]
+    end
+
+    DEV --> REPO
+    REPO --> CI
+    ACT --> CI
+    DEP --> CI
+    CI --> REG
+    REG --> CD
+    CD --> PROD
+
+    R1[Risk: mutable action/dependency input]
+    R2[Risk: secret exposure on runner]
+    R3[Risk: unsigned artifact promotion]
+
+    ACT -.-> R1
+    CI -.-> R2
+    CD -.-> R3

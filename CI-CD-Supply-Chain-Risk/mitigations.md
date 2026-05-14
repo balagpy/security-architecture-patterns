@@ -2,52 +2,77 @@
 
 ## Goals
 
-- reduce trust in mutable external build inputs
-- enforce provenance and integrity from source to deploy
-- limit blast radius of runner compromise
+- Reduce trust in mutable external build inputs.
+- Enforce source-to-deploy provenance and integrity.
+- Limit blast radius of runner or pipeline compromise.
+
+## Strategy Comparison
+
+| Strategy | Latency Impact | Complexity | Integrity Assurance Gain | Scalability |
+| --- | --- | --- | --- | --- |
+| Immutable action/dependency pinning | Low | Medium | High | High |
+| Least-privilege workflow permissions | Low | Medium | High | High |
+| Ephemeral runner hardening | Medium | High | Medium-High | Medium |
+| Artifact signing + verification gate | Medium | Medium-High | High | Medium-High |
+| Hybrid (all above) | Medium | High | Very High | Medium-High |
 
 ## Pattern Options
 
 1. Pin actions and dependencies immutably
-- design summary: use commit SHA pinning for CI actions and deterministic lockfiles for dependencies.
-- implementation complexity: low-medium
-- performance tradeoff: minimal
-- residual risk: pinned artifact itself may be malicious if pin was not vetted
+
+- Design summary: use commit SHA pinning for actions and deterministic lockfiles for dependencies.
+- Implementation complexity: Medium.
+- Performance tradeoff: minimal runtime overhead, moderate maintenance discipline.
+- Residual risk: trusted pin can still be wrong if review process is weak.
 
 2. Least-privilege workflow permissions
-- design summary: per-workflow and per-job scoped tokens, no broad write/admin defaults.
-- implementation complexity: medium
-- performance tradeoff: operational tuning overhead
-- residual risk: privilege creep over time without periodic audit
+
+- Design summary: per-workflow and per-job scoped tokens, no broad write/admin defaults.
+- Implementation complexity: Medium.
+- Performance tradeoff: low runtime cost, moderate policy governance overhead.
+- Residual risk: permission sprawl over time without regular audits.
 
 3. Isolated and ephemeral runners
-- design summary: short-lived clean runners with restricted egress and strong secret controls.
-- implementation complexity: high
-- performance tradeoff: infra cost and startup latency
-- residual risk: runtime exploit within job window
+
+- Design summary: short-lived clean runners with restricted egress and hardened execution context.
+- Implementation complexity: High.
+- Performance tradeoff: infra cost and startup latency.
+- Residual risk: exploit still possible inside job window if controls are incomplete.
 
 4. Artifact signing and provenance verification
-- design summary: sign artifacts and verify signatures/provenance before promotion/deploy.
-- implementation complexity: medium-high
-- performance tradeoff: added verification steps
-- residual risk: key management weaknesses
+
+- Design summary: sign artifacts and enforce signature/attestation verification before deploy.
+- Implementation complexity: Medium-High.
+- Performance tradeoff: added deploy gate checks and key management burden.
+- Residual risk: verification bypass through emergency/manual channels.
 
 ## Recommended Sequence
 
 1. Immediate
-- pin mutable references
-- reduce token permissions
-- block secret exposure to untrusted contexts
+
+- Pin mutable references.
+- Tighten workflow permission scopes.
+- Block secret exposure to untrusted execution contexts.
 
 2. Medium-term
-- enforce provenance checks at deploy gates
-- introduce policy checks for workflow changes
+
+- Enforce deploy-time provenance checks.
+- Add policy checks for workflow-file changes and privileged job paths.
 
 3. Long-term
-- full SLSA-aligned controls with attestation and continuous compliance checks
+
+- Align controls to SLSA/SSDF maturity targets.
+- Run recurring adversarial pipeline simulations.
+
+## When Not to Use a Pattern
+
+- Do not over-constrain workflows without staged migration, or teams may bypass controls operationally.
+- Do not treat signing as complete if provenance verification is optional.
+- Do not rely on static long-lived self-hosted runners for privileged release paths.
 
 ## Verification Plan
 
-- simulate mutable action tag drift and ensure policy blocks
-- attempt deploy with unsigned artifact and confirm rejection
-- run red-team style CI permission abuse scenarios in staging
+- Simulate mutable action-tag drift and ensure policy blocks execution.
+- Attempt deploy with unsigned artifact and confirm deterministic rejection.
+- Run token-permission abuse scenarios in staging pipelines.
+- Audit runner egress and secret-use patterns for unexpected destinations.
