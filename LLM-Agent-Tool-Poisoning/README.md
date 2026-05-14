@@ -2,9 +2,10 @@
 
 ## Executive Summary
 
-LLM-agent systems fail when untrusted content can influence tool invocation decisions without strong policy mediation. Prompt/tool poisoning often exploits trust transitivity: data from web/docs/tickets/chats is treated as instructions, and agent orchestration forwards those instructions to powerful tools.
 
-This is a control-plane design failure across model reasoning, tool permissions, and execution governance.
+Agentic systems become risky when untrusted content can quietly influence tool execution. The model may treat retrieved text as instruction-like context, and if tooling permissions are broad, a single poisoned step can trigger high-impact actions.
+
+The weak point is usually orchestration policy, not model intelligence alone.
 
 ## System Context
 
@@ -76,22 +77,26 @@ See [mitigations.md](./mitigations.md).
 
 ## Why Existing Systems Fail
 
-Agent systems fail when safety and utility are tuned independently:
-- Teams optimize tool autonomy before strict intent-policy mapping.
-- Retrieved untrusted text is blended with instruction context.
-- Broad tool scopes are granted to reduce human handoff latency.
-- Logging captures outputs but not decision provenance.
 
-Without explicit trust-tier controls, convenience paths become exploit paths.
+In practice, teams push autonomy before control maturity:
+
+- Tool breadth is expanded to reduce human handoffs.
+- Retrieval context and instruction context are not strongly separated.
+- Policy checks are coarse and do not map tightly to user intent.
+- Logging captures outputs but misses decision provenance.
+
+That combination creates a path from convenience to compromise.
 
 ## Real Incident Correlation
 
-Observed incidents and public red-team findings commonly involve:
-- Prompt injection causing unintended tool invocation.
-- Data exfiltration attempts via plugin/tool channels.
-- Agent workflow hijack through untrusted retrieval content.
 
-The recurring issue is orchestration trust design, not model capability alone.
+Public red-team work and incident reporting repeatedly show:
+
+- Prompt injection leading to unintended tool calls.
+- Data exfiltration attempts through plugin/tool channels.
+- Workflow hijack patterns originating from untrusted retrieved content.
+
+The common failure mode is weak trust-tiering in the agent control plane.
 
 ## Evidence
 
@@ -111,9 +116,10 @@ Companion demo:
 
 ## Known Limitations
 
-- Demonstrations simplify production controls and omit organization-specific policy layers.
-- Timing windows and failure behavior vary by deployment topology and traffic patterns.
-- Mitigations reduce risk but do not eliminate compromised-token or insider-abuse classes entirely.
+
+- The demo abstracts away model-specific guardrail differences.
+- It does not model full enterprise approval workflows or human-in-the-loop escalations.
+- Production safety needs layered controls across prompting, policy, runtime, and audit.
 
 ## References
 

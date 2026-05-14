@@ -2,7 +2,10 @@
 
 ## Executive Summary
 
-Multi-tenant isolation breaks when tenant context is treated as optional application metadata instead of a cryptographically or policy-bound security boundary. The result is cross-tenant data exposure through query scoping mistakes, cache key collisions, shared control-plane paths, or confused authorization flows.
+
+Multi-tenant isolation usually fails in small, boring places rather than dramatic exploits: one missing tenant predicate, one cache key without namespace, one background worker that reuses stale context. Those small misses can produce full cross-tenant exposure.
+
+The core issue is boundary enforcement consistency across API, cache, queue, and data layers.
 
 ## System Context
 
@@ -75,22 +78,26 @@ See [mitigations.md](./mitigations.md).
 
 ## Why Existing Systems Fail
 
-Tenant isolation failures often emerge from scale and product pressure:
-- Shared infrastructure is chosen to control cost and simplify operations.
-- Teams introduce caches and async workers before tenant-context controls are fully standardized.
-- One unscoped query path can bypass an otherwise strong model.
-- Legacy service contracts preserve mutable headers and weak context propagation.
 
-Isolation erodes gradually unless boundaries are enforced by default in data and policy layers.
+Teams generally make rational tradeoffs that create isolation debt:
+
+- Shared infrastructure is economically necessary early on.
+- Throughput work (caching, async processing) lands before authorization abstractions are mature.
+- Legacy interfaces keep mutable tenant context in headers for compatibility.
+- One weak path can bypass several strong ones.
+
+Isolation is only as strong as the least-enforced data path.
 
 ## Real Incident Correlation
 
-This pattern maps to well-known classes of incidents:
-- Cross-tenant data leakage from cache-key collisions.
-- Mis-scoped data access due to missing tenant predicates.
-- Cloud IAM or policy misconfiguration exposing one tenant’s data to another.
 
-The recurring theme is control inconsistency across API, cache, worker, and data paths.
+Industry incidents repeatedly map to this class of failure:
+
+- Cross-tenant leakage from cache namespace collisions.
+- Access-control drift where one query path omitted tenant scoping.
+- IAM and policy misconfiguration exposing data between tenants.
+
+These are usually systems-integration failures, not one-off coding mistakes.
 
 ## Evidence
 
@@ -110,9 +117,10 @@ Companion demo:
 
 ## Known Limitations
 
-- Demonstrations simplify production controls and omit organization-specific policy layers.
-- Timing windows and failure behavior vary by deployment topology and traffic patterns.
-- Mitigations reduce risk but do not eliminate compromised-token or insider-abuse classes entirely.
+
+- The demo uses small synthetic datasets and simplified tenancy metadata.
+- It does not model full policy engines, legal controls, or customer-specific segmentation.
+- Production isolation posture should be validated with data-layer and control-plane tests together.
 
 ## References
 

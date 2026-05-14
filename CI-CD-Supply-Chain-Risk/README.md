@@ -2,9 +2,10 @@
 
 ## Executive Summary
 
-CI/CD pipelines are high-trust control planes. Compromise of build dependencies, action plugins, runner environments, or artifact signing paths can inject malicious code into release artifacts without direct source-repo compromise.
 
-This is a trust-transitivity architecture problem across source, build, artifact, and deploy stages.
+CI/CD systems are trust multipliers: if the pipeline is compromised, downstream releases inherit that compromise quickly. In many organizations, build and release paths have broad privilege because speed matters, and that makes them high-value targets.
+
+The architectural risk is trust transitivity from source to build to artifact to deployment.
 
 ## System Context
 
@@ -75,22 +76,26 @@ See [mitigations.md](./mitigations.md).
 
 ## Why Existing Systems Fail
 
-Pipeline risk grows from delivery pressure and trust transitivity:
-- Mutable CI action references are faster to maintain than pinned SHAs.
-- Broad tokens simplify automation but increase blast radius.
-- Artifact verification is deferred to speed release cadence.
-- Third-party integrations accumulate without uniform risk gates.
 
-Pipelines become high-trust control planes with low-friction compromise paths.
+Teams usually optimize for delivery throughput first, then retrofit controls:
+
+- Mutable references are easier to maintain than immutable pins.
+- Broad tokens reduce operational friction for automation.
+- Provenance checks are deferred to keep deployment lead time low.
+- Third-party integrations accumulate faster than risk governance.
+
+The result is a powerful control plane with uneven integrity boundaries.
 
 ## Real Incident Correlation
 
-This case aligns with major supply-chain events and patterns:
-- CircleCI incident (session/token exposure impact across customers).
-- SolarWinds build-chain compromise pattern.
-- Codecov script tampering and secret-exposure pattern.
 
-The practical takeaway is to treat CI/CD as production-critical identity and integrity infrastructure.
+This maps cleanly to widely studied supply-chain incidents:
+
+- CircleCI: credential/session exposure impact patterns.
+- SolarWinds: build-chain trust compromise at scale.
+- Codecov: script-integrity and secret-exposure pathway.
+
+Different mechanics, same architectural lesson: release integrity must be verified, not assumed.
 
 ## Evidence
 
@@ -110,9 +115,10 @@ Companion demo:
 
 ## Known Limitations
 
-- Demonstrations simplify production controls and omit organization-specific policy layers.
-- Timing windows and failure behavior vary by deployment topology and traffic patterns.
-- Mitigations reduce risk but do not eliminate compromised-token or insider-abuse classes entirely.
+
+- The demo models policy decisions rather than a full enterprise build platform.
+- It does not emulate every runner-hardening or secret-management control.
+- Real resilience requires controls across code review, build, signing, and deploy gates together.
 
 ## References
 

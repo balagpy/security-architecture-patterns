@@ -2,9 +2,10 @@
 
 ## Executive Summary
 
-OAuth token confusion happens when services accept token types, audiences, or issuers beyond what the endpoint is designed to trust. Common examples include using ID tokens as API access tokens, accepting access tokens minted for a different audience, or failing to bind token validation to resource-server-specific expectations.
 
-This is a protocol-usage architecture failure, not just a parsing bug.
+OAuth token confusion tends to appear when service ecosystems grow faster than token-policy discipline. Signature checks pass, but token intent is wrong: ID token where access token was expected, wrong audience accepted, or scope interpretation too loose.
+
+The failure is usually policy ambiguity between identity and application layers.
 
 ## System Context
 
@@ -75,22 +76,26 @@ See [mitigations.md](./mitigations.md).
 
 ## Why Existing Systems Fail
 
-Token confusion typically appears during rapid multi-service growth:
-- Shared middleware validates signature but omits strict token-intent checks.
-- Teams reuse audiences across services for convenience.
-- Backward compatibility keeps permissive token acceptance paths alive.
-- Policy ownership is split between identity and application teams.
 
-This creates acceptance ambiguity that attackers can replay across services.
+This problem usually emerges from scale and compatibility pressure:
+
+- Shared middleware verifies cryptographic validity but omits strict token-use semantics.
+- Audience reuse across services looks convenient during early growth.
+- Backward-compatibility exceptions accumulate and outlive their risk review.
+- Identity and service owners often govern different parts of the decision path.
+
+What breaks is not JWT parsing; what breaks is policy precision.
 
 ## Real Incident Correlation
 
-Industry incidents repeatedly show:
-- Access tokens replayed against unintended resources.
-- ID token misuse where API authorization required access tokens.
-- Scope and audience drift across service boundaries.
 
-The root issue is trust policy ambiguity, not cryptography alone.
+Real-world OAuth failures often involve:
+
+- Token replay against unintended resource servers.
+- ID-token misuse on API authorization paths.
+- Scope or audience drift across service boundaries over time.
+
+The repeating pattern is permissive acceptance logic, not cryptographic weakness.
 
 ## Evidence
 
@@ -110,9 +115,10 @@ Companion demo:
 
 ## Known Limitations
 
-- Demonstrations simplify production controls and omit organization-specific policy layers.
-- Timing windows and failure behavior vary by deployment topology and traffic patterns.
-- Mitigations reduce risk but do not eliminate compromised-token or insider-abuse classes entirely.
+
+- The demo focuses on audience/token-use confusion and does not cover every OAuth grant edge case.
+- It omits full IdP-side policy complexity such as conditional access and tenant routing.
+- Mitigations depend on strict policy rollout across all services, not just one endpoint.
 
 ## References
 

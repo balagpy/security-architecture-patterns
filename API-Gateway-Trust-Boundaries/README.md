@@ -2,9 +2,10 @@
 
 ## Executive Summary
 
-API gateways are often assumed to be a hard trust boundary, but downstream services frequently accept identity and authorization headers without verifying call provenance. If internal services are reachable directly, or if network/policy controls are weak, attackers can bypass the gateway and inject privileged headers.
 
-This is not only an auth bug. It is a boundary-design failure between edge, mesh, and service layers.
+API gateways often become a false sense of security. Teams do authentication and coarse authorization at the edge, then downstream services quietly trust forwarded identity headers as if they were cryptographic truth. If a backend is exposed directly, or an internal workload can reach it unexpectedly, that trust collapses fast.
+
+In practice, this is less a single bug and more an architectural boundary mismatch between edge controls and service-level enforcement.
 
 ## System Context
 
@@ -77,22 +78,26 @@ See [mitigations.md](./mitigations.md).
 
 ## Why Existing Systems Fail
 
-Gateway trust assumptions break for practical reasons:
-- Internal services are exposed temporarily for debugging or migration.
-- Backend teams rely on forwarded headers to avoid duplicate auth logic.
-- Service ownership boundaries create uneven rollout of caller-identity verification.
-- Legacy east-west paths remain reachable after perimeter hardening.
 
-The architecture looks secure at the edge while internal trust paths remain forgeable.
+Most teams do not choose this design out of negligence. They usually inherit it from delivery realities:
+
+- Re-implementing full auth logic in every backend feels expensive and duplicative.
+- Temporary internal exposure for debugging or migration often outlives its original purpose.
+- Service teams and platform teams ship at different speeds, so boundary controls drift.
+- Header-based identity propagation is operationally convenient, so it survives longer than it should.
+
+Over time, "gateway-enforced" becomes an assumption rather than a verified property.
 
 ## Real Incident Correlation
 
-Common breach patterns correlate with this design failure:
-- Internal API endpoints reachable from unintended network paths.
-- Header spoofing and confused deputy scenarios in service-to-service calls.
-- SSRF pivots that bypass edge controls and hit trusted internal interfaces.
 
-The operational lesson is that perimeter enforcement does not replace hop-by-hop trust verification.
+This pattern shows up in incidents where internal reachability and caller trust were overestimated:
+
+- Backend endpoints unintentionally reachable from broader network segments.
+- Header spoofing or confused-deputy behavior in service-to-service paths.
+- SSRF pivots that bypass perimeter checks and land on trusted internal APIs.
+
+The recurring lesson is simple: perimeter controls reduce exposure, but they do not replace caller-authenticity checks at each hop.
 
 ## Evidence
 
@@ -112,9 +117,10 @@ Companion demo:
 
 ## Known Limitations
 
-- Demonstrations simplify production controls and omit organization-specific policy layers.
-- Timing windows and failure behavior vary by deployment topology and traffic patterns.
-- Mitigations reduce risk but do not eliminate compromised-token or insider-abuse classes entirely.
+
+- The demo intentionally simplifies network policy and service-mesh identity controls.
+- Real environments often include mixed legacy and modern trust paths not modeled here.
+- Mitigations reduce spoofing risk but still require strong key/cert lifecycle operations.
 
 ## References
 

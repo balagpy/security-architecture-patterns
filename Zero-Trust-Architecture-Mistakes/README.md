@@ -2,9 +2,10 @@
 
 ## Executive Summary
 
-Many "zero trust" programs fail by implementing identity checks at the edge while preserving implicit trust inside networks, workloads, and service paths. The mismatch between policy intent and runtime enforcement creates false assurance.
 
-This is a governance-to-runtime architecture gap, not a branding issue.
+Many zero-trust programs look strong on slides and weak in runtime paths. User ingress is hardened, but east-west service behavior still depends on implicit trust, stale exceptions, or incomplete workload identity.
+
+The gap is usually between policy intent and enforcement reality.
 
 ## System Context
 
@@ -74,22 +75,26 @@ See [mitigations.md](./mitigations.md).
 
 ## Why Existing Systems Fail
 
-Zero trust implementations degrade under operational constraints:
-- Strong user auth is deployed first; workload identity lags.
-- Exceptions added during outages become long-lived bypasses.
-- East-west policy rollout is harder than perimeter policy rollout.
-- Legacy services resist mTLS and fine-grained authorization integration.
 
-Programs report policy intent success while runtime enforcement remains uneven.
+These gaps typically come from sequencing and operational friction:
+
+- User auth controls roll out faster than workload identity controls.
+- Exception paths created during incidents are not retired on schedule.
+- East-west policy migration is harder than perimeter policy migration.
+- Legacy systems resist mTLS and fine-grained authorization integration.
+
+The outcome is uneven enforcement hidden behind strong top-level messaging.
 
 ## Real Incident Correlation
 
-These failure patterns correlate with common enterprise incidents:
-- Lateral movement after initial foothold despite strong SSO/MFA.
-- Internal service abuse through implicit trust paths.
-- Exception-driven access expansion without expiry governance.
 
-Real progress depends on continuous runtime verification, not perimeter declarations.
+Common enterprise incident patterns fit this model:
+
+- Lateral movement after initial foothold despite strong SSO/MFA.
+- Internal service abuse through broad trust inside network zones.
+- Long-lived exceptions expanding access beyond original intent.
+
+What matters most is continuous runtime verification, not perimeter posture alone.
 
 ## Evidence
 
@@ -109,9 +114,10 @@ Companion demo:
 
 ## Known Limitations
 
-- Demonstrations simplify production controls and omit organization-specific policy layers.
-- Timing windows and failure behavior vary by deployment topology and traffic patterns.
-- Mitigations reduce risk but do not eliminate compromised-token or insider-abuse classes entirely.
+
+- The demo does not represent full identity fabric or enterprise segmentation complexity.
+- It simplifies policy engines and workload attestation mechanics.
+- Real rollout quality depends on exception governance and continuous validation discipline.
 
 ## References
 
