@@ -21,6 +21,14 @@ Designed for:
 - Cloud-native engineering teams
 - Security researchers
 
+## Research Principles
+
+- Architecture-first analysis.
+- Realistic operational assumptions.
+- Distributed-systems perspective.
+- Tradeoff-aware security engineering.
+- Defensive and educational focus.
+
 ## What You Will Find
 
 Each case study is built as a repeatable analysis unit with:

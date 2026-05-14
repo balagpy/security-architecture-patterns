@@ -2,54 +2,71 @@
 
 ## Goals
 
-- minimize post-revocation token acceptance window
-- enforce consistent policy across all service instances
-- keep latency and availability within operational limits
+- Minimize post-revocation token acceptance window.
+- Enforce consistent policy across service replicas.
+- Keep latency and availability within explicit operational limits.
+
+## Strategy Comparison
+
+| Strategy | Latency Impact | Complexity | Revocation Speed | Scalability |
+| --- | --- | --- | --- | --- |
+| Local cache denylist only | Low | Medium | Medium-Low | High |
+| Per-request token introspection | High | Medium | High | Medium-Low |
+| Short-lived access tokens only | Very low | Low | Low-Medium | High |
+| Event-driven invalidation + cache | Low-Medium | High | High | High |
+| Hybrid: cache + selective introspection | Medium | High | High | Medium-High |
 
 ## Pattern Options
 
-1. Short-lived Access Tokens + Rotating Refresh Tokens
-- design summary: keep access token TTL very short (for example 5-10 minutes) and rotate refresh tokens with replay detection.
-- implementation complexity: medium
-- performance tradeoff: minimal request-path overhead
-- residual risk: non-zero replay window until access token expiry
+1. Short-lived access tokens + rotating refresh tokens
 
-2. Central Token Introspection for High-Risk Endpoints
-- design summary: sensitive operations (payments, admin actions, credential updates) require online liveness check.
-- implementation complexity: medium-high
-- performance tradeoff: added dependency and latency on request path
-- residual risk: introspection outage pressure; must define fail policy
+- Design summary: reduce access-token lifetime and rotate refresh tokens with replay detection.
+- Implementation complexity: Medium.
+- Performance tradeoff: low request-path overhead, higher token refresh volume.
+- Residual risk: replay window still exists until access-token expiry.
 
-3. Event-Driven Revocation Fan-Out
-- design summary: publish revocation events to all auth-enforcing services/gateways for near-real-time cache invalidation.
-- implementation complexity: high
-- performance tradeoff: operational complexity in messaging reliability and ordering
-- residual risk: ordering gaps and consumer lag if not measured
+2. Central token introspection for high-risk endpoints
 
-4. Versioned Session State
-- design summary: include session/version claim and reject tokens with stale version compared to central session state.
-- implementation complexity: medium
-- performance tradeoff: requires low-latency state lookup or cache strategy
-- residual risk: lookup outages and eventual consistency pitfalls
+- Design summary: require online liveness checks for sensitive operations.
+- Implementation complexity: Medium-High.
+- Performance tradeoff: additional dependency and latency in request path.
+- Residual risk: introspection outages require strict fail policy choices.
+
+3. Event-driven revocation fan-out
+
+- Design summary: publish revocation events and invalidate local caches quickly across all instances.
+- Implementation complexity: High.
+- Performance tradeoff: messaging reliability and ordering overhead.
+- Residual risk: consumer lag, replay window if delivery is delayed.
+
+4. Versioned session state
+
+- Design summary: embed session version in token and reject stale versions against central state.
+- Implementation complexity: Medium.
+- Performance tradeoff: central state lookup or synchronized cache requirement.
+- Residual risk: consistency and availability pressure on state service.
 
 ## Recommended Sequence
 
 1. Immediate
-- shorten access token TTL
-- enforce denylist checks on highest-risk routes
-- instrument revocation latency metrics
+
+- Shorten access-token TTL.
+- Enforce denylist checks on highest-risk routes.
+- Instrument revocation convergence metrics.
 
 2. Medium-term
-- implement event-driven invalidation and consistency checks across instances
-- remove mixed enforcement paths during deploys
+
+- Add event-driven invalidation and consistency checks.
+- Eliminate mixed enforcement behavior during rollout.
 
 3. Long-term
-- standardize identity control plane with explicit SLOs for revocation convergence
-- threat-model revocation behavior in architecture reviews
+
+- Define revocation convergence SLOs at platform level.
+- Add revocation behavior to architecture review gates.
 
 ## Verification Plan
 
-- test same revoked token against every replica and gateway hop
-- chaos test revocation backend latency/outage and validate policy behavior
-- measure: revoke timestamp to final reject timestamp (p95/p99)
-- verify no route bypasses centralized policy for sensitive actions
+- Replay a revoked token against every replica and route class.
+- Inject revocation-backend latency/outage and verify deterministic behavior.
+- Measure revoke-event timestamp to final-reject timestamp (`p95`, `p99`).
+- Validate no high-risk route bypasses liveness enforcement.

@@ -47,6 +47,26 @@ See `auth-flow.svg` (rendered) and `diagrams/auth-flow.mmd` (source).
 
 ![Auth Flow Diagram](./auth-flow.svg)
 
+## Threat Model
+
+Trust assumptions:
+
+- Token signature verification is correct and issuer keys are valid.
+- Revocation writes are durable in the control plane.
+- Service replicas should converge to consistent revocation decisions.
+
+Attacker capability assumptions:
+
+- Attacker can obtain at least one valid bearer token.
+- Attacker can generate high-rate replay requests across endpoints/replicas.
+- Attacker cannot forge signatures, but can exploit revocation timing windows.
+
+Failure conditions that matter:
+
+- Revocation propagation lag exceeds acceptable risk window.
+- Replica enforcement diverges under cache or dependency degradation.
+- Fail-open behavior activates on high-risk routes.
+
 ## Failure Modes
 
 ### Broken Assumption
@@ -128,6 +148,12 @@ The measurable risk is `t1 -> t3`: time-to-final-reject after revocation.
 - Spikes in post-logout activity by session/device fingerprint.
 - Instance divergence where one replica accepts and another rejects the same token.
 - Revocation SLO breach: elapsed time from revoke event to final reject.
+
+## Mitigation Architecture
+
+See `mitigation-architecture.svg` (rendered) and `diagrams/mitigation-architecture.mmd` (source).
+
+![Mitigation Architecture Diagram](./mitigation-architecture.svg)
 
 ## Mitigation Strategy
 

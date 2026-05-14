@@ -1,0 +1,55 @@
+flowchart LR
+    subgraph Internet[Untrusted Network]
+        C[Client]
+        ATT[Attacker]
+    end
+
+    subgraph Edge[Edge Zone]
+        GW[API Gateway]
+        PDP[Policy Decision Point]
+    end
+
+    subgraph App[Service Zone]
+        S1[Service A]
+        S2[Service B]
+        S3[Service C]
+        L1[(Local Cache A)]
+        L2[(Local Cache B)]
+        L3[(Local Cache C)]
+        S1 --> L1
+        S2 --> L2
+        S3 --> L3
+    end
+
+    subgraph Identity[Identity Control Plane]
+        IDP[Auth Service]
+        INT[Introspection Endpoint]
+    end
+
+    subgraph State[Revocation State Plane]
+        R[(Redis Revocation Store)]
+        BUS[(Revocation Event Bus)]
+    end
+
+    C --> GW --> PDP
+    PDP --> S1
+    PDP --> S2
+    PDP --> S3
+
+    IDP --> R
+    IDP --> BUS
+    IDP --> INT
+
+    BUS -. near-real-time invalidate .-> S1
+    BUS -. near-real-time invalidate .-> S2
+    BUS -. near-real-time invalidate .-> S3
+
+    S1 --> R
+    S2 --> R
+    S3 --> R
+
+    S1 -. high-risk route check .-> INT
+    S2 -. high-risk route check .-> INT
+    S3 -. high-risk route check .-> INT
+
+    ATT --> GW
