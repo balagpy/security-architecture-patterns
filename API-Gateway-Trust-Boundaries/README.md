@@ -70,7 +70,7 @@ See [mitigations.md](./mitigations.md).
 ## Practical Demo
 
 Companion lab:
-- [api-gateway-boundary-lab](../labs/api-gateway-boundary-lab/README.md)
+- [api-gateway-boundary-lab](../demo/api-gateway-boundary-lab/README.md)
 
 ## References
 

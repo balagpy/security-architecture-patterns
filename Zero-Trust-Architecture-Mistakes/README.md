@@ -67,7 +67,7 @@ See [mitigations.md](./mitigations.md).
 ## Practical Demo
 
 Companion lab:
-- [zero-trust-mistakes-lab](../labs/zero-trust-mistakes-lab/README.md)
+- [zero-trust-mistakes-lab](../demo/zero-trust-mistakes-lab/README.md)
 
 ## References
 

@@ -69,7 +69,7 @@ See [mitigations.md](./mitigations.md).
 ## Practical Demo
 
 Companion lab:
-- [llm-agent-tool-poisoning-lab](../labs/llm-agent-tool-poisoning-lab/README.md)
+- [llm-agent-tool-poisoning-lab](../demo/llm-agent-tool-poisoning-lab/README.md)
 
 ## References
 

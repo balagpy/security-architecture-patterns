@@ -68,7 +68,7 @@ See [mitigations.md](./mitigations.md).
 ## Practical Demo
 
 Companion lab:
-- [oauth-token-confusion-lab](../labs/oauth-token-confusion-lab/README.md)
+- [oauth-token-confusion-lab](../demo/oauth-token-confusion-lab/README.md)
 
 ## References
 

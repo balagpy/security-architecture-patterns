@@ -55,10 +55,10 @@ Each topic directory includes:
 - `references.md`
 - optional `diagrams/*.mmd` sources
 
-## Companion Labs
+## Companion Demos
 
 Practical simulations are maintained inside this repository:
-- [labs/](./labs/)
+- [demo/](./demo/)
 
 ## Working Standards
 

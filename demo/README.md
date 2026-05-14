@@ -1,12 +1,12 @@
-# security-architecture-labs
+# security-architecture-demos
 
-Companion practical labs for `security-architecture-patterns`.
+Companion practical demos for `security-architecture-patterns`.
 
 ## Purpose
 
 This repository provides runnable demonstrations of architecture-level security failures and corresponding mitigation behavior.
 
-## Lab Portfolio
+## Demo Portfolio
 
 1. `jwt-revocation-lab`
 2. `multi-tenant-isolation-lab`
@@ -25,7 +25,7 @@ This repository provides runnable demonstrations of architecture-level security 
 
 ## Quick Start
 
-Run any lab:
+Run any demo:
 
 ```bash
 cd <lab-directory>

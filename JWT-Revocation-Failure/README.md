@@ -97,7 +97,7 @@ High-level direction:
 ## Practical Demo
 
 Runnable companion lab:
-- [jwt-revocation-lab](../labs/jwt-revocation-lab/README.md)
+- [jwt-revocation-lab](../demo/jwt-revocation-lab/README.md)
 
 ## References
 

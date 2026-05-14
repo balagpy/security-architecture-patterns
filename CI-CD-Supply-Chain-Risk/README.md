@@ -68,7 +68,7 @@ See [mitigations.md](./mitigations.md).
 ## Practical Demo
 
 Companion lab:
-- [cicd-supply-chain-lab](../labs/cicd-supply-chain-lab/README.md)
+- [cicd-supply-chain-lab](../demo/cicd-supply-chain-lab/README.md)
 
 ## References
 

@@ -68,7 +68,7 @@ See [mitigations.md](./mitigations.md).
 ## Practical Demo
 
 Companion lab:
-- [multi-tenant-isolation-lab](../labs/multi-tenant-isolation-lab/README.md)
+- [multi-tenant-isolation-lab](../demo/multi-tenant-isolation-lab/README.md)
 
 ## References
 
