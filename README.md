@@ -21,6 +21,17 @@ Each case study is built as a repeatable analysis unit with:
 - mitigation patterns and tradeoff analysis
 - references for verification
 
+
+## Visual Examples
+
+JWT Revocation Failure - Baseline Architecture:
+
+![JWT Revocation Architecture](./JWT-Revocation-Failure/architecture.svg)
+
+API Gateway Trust Boundaries - Attack Flow:
+
+![API Gateway Attack Flow](./API-Gateway-Trust-Boundaries/attack-flow.svg)
+
 ## Case Studies
 
 1. [JWT Revocation Failure](./JWT-Revocation-Failure/README.md)

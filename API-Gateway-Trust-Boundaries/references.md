@@ -1,18 +1,14 @@
 # References - API Gateway Trust Boundaries
 
-## Standards and Guidance
+## Standards and Security Models
 
-- OWASP API Security Top 10
-- NIST SP 800-207 (Zero Trust Architecture)
-- CNCF SPIFFE/SPIRE workload identity documentation
+- [OWASP API Security Top 10](https://owasp.org/API-Security/)
+- [NIST SP 800-207: Zero Trust Architecture](https://csrc.nist.gov/pubs/sp/800/207/final)
+- [RFC 8705: OAuth 2.0 Mutual-TLS Client Authentication](https://datatracker.ietf.org/doc/html/rfc8705)
 
-## Architecture References
+## Identity and Runtime Enforcement
 
-- service mesh mTLS and identity docs
-- gateway vendor security hardening guides
-- cloud provider private ingress/service networking guidance
-
-## Suggested Incident/Research Sources
-
-- public incidents involving internal API exposure and trust bypass
-- conference talks on identity propagation and boundary failures
+- [SPIFFE/SPIRE](https://spiffe.io/docs/latest/spiffe-about/overview/)
+- [Kubernetes Ingress Hardening](https://kubernetes.io/docs/concepts/services-networking/ingress/)
+- [Istio mTLS and Peer Authentication](https://istio.io/latest/docs/tasks/security/authentication/authn-policy/)
+- [AWS API Gateway Security Best Practices](https://docs.aws.amazon.com/apigateway/latest/developerguide/security-best-practices.html)

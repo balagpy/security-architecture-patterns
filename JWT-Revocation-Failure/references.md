@@ -1,20 +1,14 @@
 # References - JWT Revocation Failure
 
-## Standards and Core Specs
+## Core Standards
 
-- RFC 7519: JSON Web Token (JWT)
-- RFC 7009: OAuth 2.0 Token Revocation
-- RFC 7662: OAuth 2.0 Token Introspection
-- RFC 8725: JWT Best Current Practices
+- [RFC 7519: JSON Web Token (JWT)](https://datatracker.ietf.org/doc/html/rfc7519)
+- [RFC 7009: OAuth 2.0 Token Revocation](https://datatracker.ietf.org/doc/html/rfc7009)
+- [RFC 7662: OAuth 2.0 Token Introspection](https://datatracker.ietf.org/doc/html/rfc7662)
+- [RFC 8725: JWT Best Current Practices](https://datatracker.ietf.org/doc/html/rfc8725)
 
-## Architecture and Platform Guidance
+## Security Guidance
 
-- OWASP JSON Web Token Cheat Sheet
-- OAuth 2.0 Security Best Current Practice
-- NIST SP 800-207 (Zero Trust Architecture)
-
-## Suggested Incident/Practice Research
-
-- public postmortems involving stale auth/session state
-- identity platform engineering blogs on token lifetime and revocation strategy
-- conference talks on distributed auth consistency and session invalidation
+- [OWASP JWT Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/JSON_Web_Token_for_Java_Cheat_Sheet.html)
+- [OAuth 2.0 Security BCP (RFC 9700)](https://datatracker.ietf.org/doc/html/rfc9700)
+- [NIST SP 800-207: Zero Trust Architecture](https://csrc.nist.gov/pubs/sp/800/207/final)

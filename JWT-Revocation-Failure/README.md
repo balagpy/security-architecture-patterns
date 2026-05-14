@@ -25,6 +25,8 @@ The third assumption is where systems often fail.
 
 See `architecture.svg` (rendered) and `diagrams/architecture.mmd` (source).
 
+![Architecture Diagram](./architecture.svg)
+
 Core components:
 - Auth Service (issue/revoke)
 - Redis revocation store (`jti`, `sid`, or token-hash denylist)
@@ -64,6 +66,8 @@ Attackers exploit that timing window.
 
 See `attack-flow.svg` (rendered) and `diagrams/attack-flow.mmd` (source).
 
+![Attack Flow Diagram](./attack-flow.svg)
+
 Representative replay path:
 1. Attacker obtains a valid token (stolen device/session leak/log exposure).
 2. User logs out or security team revokes session.
@@ -93,6 +97,30 @@ High-level direction:
 - reduce revocation window with short-lived access tokens
 - standardize revocation enforcement via central introspection for sensitive routes
 - use push-based invalidation events and strict fail-closed policy for high-risk operations
+
+
+## Common Anti-Patterns
+
+- Long-lived access tokens with weak session invalidation controls.
+- Best-effort cache refresh without revocation convergence SLOs.
+- Mixed fail-open and fail-closed behavior across services.
+- Revocation checks enforced only at gateway, not downstream high-risk services.
+
+## Mitigation Decision Matrix
+
+| Pattern | Security Gain | Latency Cost | Operational Complexity | Best Fit |
+| --- | --- | --- | --- | --- |
+| Short access-token TTL | Medium | Low | Low | Broad baseline hardening |
+| Central introspection on sensitive routes | High | Medium | Medium | High-value operations |
+| Event-driven revocation fan-out | High | Low-Medium | High | Large distributed fleets |
+| Session version checks | Medium-High | Medium | Medium | Stateful identity platforms |
+
+## Validation Scenarios
+
+1. Revoke token during sustained request replay and measure time-to-last-accept.
+2. Inject revocation-store latency and verify deterministic policy behavior.
+3. Test rolling deploy with mixed versions to ensure no bypass paths.
+4. Replay revoked tokens against every public and internal enforcement hop.
 
 ## Practical Demo
 

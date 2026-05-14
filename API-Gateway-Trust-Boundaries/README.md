@@ -21,6 +21,8 @@ Hidden assumption:
 
 See `architecture.svg` (rendered) and `diagrams/architecture.mmd` (source).
 
+![Architecture Diagram](./architecture.svg)
+
 ## Normal Flow
 
 1. Client authenticates at gateway.
@@ -48,6 +50,8 @@ See `architecture.svg` (rendered) and `diagrams/architecture.mmd` (source).
 ## Attack/Abuse Flow
 
 See `attack-flow.svg` (rendered) and `diagrams/attack-flow.mmd` (source).
+
+![Attack Flow Diagram](./attack-flow.svg)
 
 ## Impact
 
