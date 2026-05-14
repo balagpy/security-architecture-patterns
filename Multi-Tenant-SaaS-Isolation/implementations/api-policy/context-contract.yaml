@@ -1,0 +1,13 @@
+required_context:
+  - tenant_id
+  - subject_id
+  - authz_scope
+
+rules:
+  read:
+    require_tenant_scope: true
+  write:
+    require_tenant_scope: true
+  admin:
+    require_tenant_scope: true
+    require_additional_policy: true

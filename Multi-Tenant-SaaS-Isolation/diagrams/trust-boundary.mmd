@@ -1,0 +1,33 @@
+flowchart TB
+    subgraph B1[Boundary 1: Tenant User to API]
+        TA[Tenant A User]
+        TB[Tenant B User]
+        API[Shared API]
+    end
+
+    subgraph B2[Boundary 2: Service and Cache]
+        AUTH[AuthZ Layer]
+        CACHE[(Shared Cache)]
+        WORKER[Async Worker]
+    end
+
+    subgraph B3[Boundary 3: Data Plane]
+        DB[(Shared DB)]
+        RLS[Row-Level Policy]
+    end
+
+    TA --> API
+    TB --> API
+    API --> AUTH
+    AUTH --> CACHE
+    AUTH --> DB
+    WORKER --> DB
+    RLS --> DB
+
+    R1[Risk: missing tenant predicate]
+    R2[Risk: cache namespace collision]
+    R3[Risk: context leakage in async jobs]
+
+    AUTH -.-> R1
+    CACHE -.-> R2
+    WORKER -.-> R3

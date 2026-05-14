@@ -2,54 +2,77 @@
 
 ## Goals
 
-- make tenant boundary non-bypassable by default
-- remove developer-dependent manual scoping patterns
-- ensure uniform policy across API, workers, cache, and data planes
+- Make tenant boundary non-bypassable by default.
+- Remove manual, developer-dependent scoping patterns.
+- Enforce uniform policy across API, worker, cache, and data planes.
+
+## Strategy Comparison
+
+| Strategy | Latency Impact | Complexity | Isolation Assurance Gain | Scalability |
+| --- | --- | --- | --- | --- |
+| Tenant-scoped DAL guards | Low | Medium | High | High |
+| Cache + queue namespacing | Low | Low-Medium | Medium-High | High |
+| Data-layer RLS enforcement | Medium | Medium-High | High | Medium-High |
+| Signed tenant context propagation | Low-Medium | Medium | Medium-High | High |
+| Hybrid (all above) | Medium | High | Very High | Medium-High |
 
 ## Pattern Options
 
 1. Database-enforced tenant isolation
-- design summary: enforce row-level security (RLS) or equivalent policies keyed to authenticated tenant context.
-- implementation complexity: medium-high
-- performance tradeoff: policy planning overhead, indexing requirements
-- residual risk: policy misconfiguration and privileged bypass roles
+
+- Design summary: enforce row-level security (RLS) or equivalent policy keyed to authenticated tenant context.
+- Implementation complexity: Medium-High.
+- Performance tradeoff: query planning overhead and role model complexity.
+- Residual risk: policy misconfiguration or privileged bypass roles.
 
 2. Typed tenant context propagation
-- design summary: tenant identity propagated via signed internal identity or service token claims, not mutable headers.
-- implementation complexity: medium
-- performance tradeoff: minimal
-- residual risk: legacy services with mixed trust assumptions
+
+- Design summary: tenant identity propagated through signed/internal identity context, not mutable client headers.
+- Implementation complexity: Medium.
+- Performance tradeoff: minimal runtime overhead.
+- Residual risk: legacy paths still accepting weak context contracts.
 
 3. Mandatory query guards in data access layer
-- design summary: shared repository/ORM wrappers require tenant scope for all entity operations.
-- implementation complexity: medium
-- performance tradeoff: low
-- residual risk: raw SQL escape hatches and migration scripts
+
+- Design summary: shared DAL/repository wrappers require tenant scope for all entity operations.
+- Implementation complexity: Medium.
+- Performance tradeoff: low request-path overhead.
+- Residual risk: raw SQL escape paths and migration tooling bypass.
 
 4. Tenant-scoped cache and queue namespaces
-- design summary: namespace all cache keys and async job payloads by tenant and auth context version.
-- implementation complexity: low-medium
-- performance tradeoff: larger keyspace and metadata overhead
-- residual risk: old keys/jobs lingering after schema changes
+
+- Design summary: namespace all cache keys and async payloads by tenant and context version.
+- Implementation complexity: Low-Medium.
+- Performance tradeoff: larger keyspace and metadata overhead.
+- Residual risk: stale keys/jobs and partial adoption across services.
 
 ## Recommended Sequence
 
 1. Immediate
-- block known unscoped endpoints
-- enforce cache key namespacing standards
-- add runtime guards for missing tenant scope
+
+- Block known unscoped endpoint/query paths.
+- Enforce tenant-namespaced cache standards.
+- Add runtime guards for missing tenant context.
 
 2. Medium-term
-- centralize authorization and tenant context libraries
-- adopt tenant policy tests in CI
+
+- Centralize tenant-context and authorization libraries.
+- Introduce tenant-isolation contract tests in CI.
 
 3. Long-term
-- database-level policy enforcement
-- continuous isolation verification and attack simulation
+
+- Add data-layer policy enforcement (RLS or equivalent).
+- Run continuous isolation simulations and adversarial probes.
+
+## When Not to Use a Pattern
+
+- Do not rely only on cache namespacing without query-level tenant enforcement.
+- Do not enforce RLS without clear database role and migration strategy.
+- Do not over-index on centralized policy if service owners cannot operate context contracts consistently.
 
 ## Verification Plan
 
-- contract tests asserting all list/get/update/delete paths require tenant scope
-- synthetic cross-tenant probes in staging
-- log correlation: token tenant vs data tenant on sampled requests
-- chaos tests for worker/context reuse under concurrency
+- Contract tests for tenant scope on all read/write operations.
+- Synthetic cross-tenant probes in staging and pre-production.
+- Query log validation for mandatory tenant predicates.
+- Async worker chaos tests for context leakage and replay.

@@ -1,0 +1,15 @@
+flowchart LR
+    C[Client] --> API[Shared API]
+    API --> CTX[Signed Tenant Context]
+    CTX --> DAL[Tenant-Scoped Data Access Layer]
+    DAL --> DB[(Shared DB + RLS)]
+    API --> CACHE[(Tenant-Namespaced Cache)]
+    API --> Q[(Tenant-Scoped Queue)]
+    Q --> W[Worker with Context Validation]
+    W --> DB
+
+    NOTE1[All reads/writes require tenant scope]
+    NOTE2[Cache and queue payloads include tenant namespace]
+
+    DAL -.-> NOTE1
+    CACHE -.-> NOTE2

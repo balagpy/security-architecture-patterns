@@ -1,0 +1,23 @@
+sequenceDiagram
+    participant A as Tenant A User
+    participant API as API
+    participant Cache
+    participant DB
+
+    rect rgb(255,245,245)
+    Note over A,DB: Before mitigation
+    A->>API: GET /invoice/42
+    API->>Cache: GET invoice:42
+    Cache-->>API: Tenant B record
+    API-->>A: Cross-tenant leak
+    end
+
+    rect rgb(245,255,245)
+    Note over A,DB: After mitigation
+    A->>API: GET /invoice/42
+    API->>Cache: GET tenant:a:invoice:42
+    Cache-->>API: miss
+    API->>DB: SELECT ... WHERE tenant_id='tenant-a' AND id=42
+    DB-->>API: Tenant A record only
+    API-->>A: Scoped response
+    end
