@@ -2,17 +2,6 @@
 
 Security architecture research repository focused on how modern systems fail at scale and how to design resilient, measurable mitigations.
 
-## Responsible Use Disclaimer
-
-This repository is provided for educational and defensive security purposes only.
-
-The content is intended to support:
-- security architecture learning
-- threat modeling and design review
-- resilience engineering and risk reduction
-
-It is not intended to enable unauthorized access, exploitation, or any malicious activity. Use these materials only in legal, authorized, and ethical environments.
-
 ## Repository Scope
 
 This repository is an architecture research platform.
@@ -65,3 +54,14 @@ Practical simulations are maintained inside this repository:
 - [METHODOLOGY.md](./METHODOLOGY.md)
 - [ROADMAP.md](./ROADMAP.md)
 - [CONTRIBUTING.md](./CONTRIBUTING.md)
+
+## Responsible Use Disclaimer
+
+This repository is provided for educational and defensive security purposes only.
+
+The content is intended to support:
+- security architecture learning
+- threat modeling and design review
+- resilience engineering and risk reduction
+
+It is not intended to enable unauthorized access, exploitation, or any malicious activity. Use these materials only in legal, authorized, and ethical environments.
