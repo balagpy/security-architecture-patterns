@@ -1,13 +1,20 @@
 sequenceDiagram
-    participant User
-    participant IdP as Auth Service
-    participant Redis as Revocation Store
-    participant API as API Instance
-    participant Att as Attacker
+    participant C as Client
+    participant GW as API Gateway
+    participant S as Service Instance
+    participant R as Redis
+    participant L as Local Cache
 
-    User->>IdP: Logout / revoke session
-    IdP->>Redis: revoked(jti)=true
-    Att->>API: Replay old token
-    API-->>Att: Allowed during stale window
-    API->>Redis: Refresh/check revocation
-    API-->>Att: Rejected after convergence
+    C->>GW: Bearer token request
+    GW->>S: Forward request
+    S->>L: Check local revoked-jti cache
+    alt cache miss
+        S->>R: Query revoked:jti
+        R-->>S: not revoked
+        S->>L: cache(jti=allowed, ttl=20s)
+        S-->>GW: allow
+    else cache hit revoked
+        S-->>GW: deny 401
+    end
+
+    Note over R,S: On revoke, convergence depends on cache TTL, pub/sub lag, and retry behavior

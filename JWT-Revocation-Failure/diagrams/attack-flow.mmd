@@ -1,15 +1,25 @@
 sequenceDiagram
-    participant U as User
-    participant Att as Attacker
+    participant User
     participant IdP as Auth Service
-    participant APIA as API Instance A (stale)
-    participant APIM as API Mitigated
-    participant Redis as Revocation Store
+    participant Redis as Redis Revocation Store
+    participant Bus as Revocation Event Bus
+    participant A as Service A (stale cache)
+    participant B as Service B (fresh cache)
+    participant Att as Attacker
 
-    U->>IdP: Logout / revoke session
-    IdP->>Redis: Write revoked(jti)
-    Att->>APIA: Replay stolen token immediately
-    APIA-->>Att: Access granted (stale revocation cache)
-    Att->>APIM: Replay same token
-    APIM->>Redis: Sync revocation check
-    APIM-->>Att: 401 revoked
+    User->>IdP: Logout / session revoke
+    IdP->>Redis: SET revoked:jti=1
+    IdP->>Bus: Publish revoke(jti)
+
+    Note over A,B: Propagation delay + uneven cache refresh
+
+    Att->>A: Replay stolen token (t+1s)
+    A-->>Att: 200 OK (stale local cache)
+
+    Bus-->>B: Revoke event applied quickly
+    Att->>B: Replay same token (t+2s)
+    B-->>Att: 401 revoked
+
+    Bus-->>A: Revoke event delayed
+    Att->>A: Replay token again (t+10s)
+    A-->>Att: 401 revoked

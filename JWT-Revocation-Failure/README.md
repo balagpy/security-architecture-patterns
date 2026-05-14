@@ -2,26 +2,26 @@
 
 ## Executive Summary
 
-JWT revocation frequently fails in distributed architectures because revocation is treated as a control-plane event while token validation is executed as a low-latency data-plane decision. When services validate tokens offline (signature + `exp`) and rely on eventually consistent revocation caches, revoked tokens can remain usable across instances for seconds or minutes.
+JWT revocation frequently fails in distributed architectures because revocation is a control-plane action while token validation is a latency-sensitive data-plane decision. When services validate tokens offline (signature + `exp`) and use eventually consistent revocation state, revoked tokens can remain usable for seconds or minutes.
 
-This gap is not a cryptographic failure. It is an architecture consistency failure under scale, propagation delay, cache staleness, and fail-open behavior.
+This is rarely a crypto failure. It is typically a systems-consistency failure under replication lag, cache staleness, fail-open behavior, and uneven rollout across replicas.
 
 ## System Context
 
 Typical system architecture:
 
-- identity provider issues short-lived access tokens and longer-lived refresh tokens
-- API gateway forwards bearer tokens to multiple backend services
-- services validate JWTs locally using issuer keys
-- revocation state is stored in Redis or similar KV store and optionally copied into per-instance memory caches
+- Identity provider issues short-lived access tokens and longer-lived refresh tokens.
+- API gateway forwards bearer tokens to multiple backend services.
+- Services validate JWTs locally using issuer keys.
+- Revocation state is stored in Redis or equivalent and may be mirrored in local in-memory caches.
 
 Trust model:
 
-- signed JWT is trusted as authentic
-- revocation store is trusted as the source of session invalidation truth
-- each service instance is trusted to enforce revocation uniformly
+- Signed JWT is trusted as authentic.
+- Revocation state is trusted as the source of session invalidation truth.
+- Every service instance is assumed to enforce revocation consistently.
 
-The third assumption is where systems often fail.
+The third assumption is where production systems often fail.
 
 ## Baseline Architecture
 
@@ -29,43 +29,47 @@ See `architecture.svg` (rendered) and `diagrams/architecture.mmd` (source).
 
 ![Architecture Diagram](./architecture.svg)
 
-Core components:
-- Auth Service (issue/revoke)
-- Redis revocation store (`jti`, `sid`, or token-hash denylist)
-- API Service replicas (stateless auth checks + optional local cache)
-- clients with bearer tokens
+## Trust Boundaries
 
-## Normal Flow
+See `trust-boundary.svg` (rendered) and `diagrams/trust-boundary.mmd` (source).
 
-1. Client authenticates and receives JWT containing `sub`, `jti`, `iat`, `exp`, `aud`.
-2. Client calls service with bearer token.
-3. Service validates signature and claims.
-4. Service optionally checks revocation source or local revocation cache.
-5. Access granted.
+![Trust Boundary Diagram](./trust-boundary.svg)
+
+## Distributed Topology
+
+See `distributed-topology.svg` (rendered) and `diagrams/distributed-topology.mmd` (source).
+
+![Distributed Topology Diagram](./distributed-topology.svg)
+
+## Normal Auth Flow
+
+See `auth-flow.svg` (rendered) and `diagrams/auth-flow.mmd` (source).
+
+![Auth Flow Diagram](./auth-flow.svg)
 
 ## Failure Modes
 
 ### Broken Assumption
 
-"If revocation is written to Redis, all services will enforce revocation immediately."
+"If revocation is written centrally, all services will enforce revocation immediately."
 
 ### Trigger Conditions
 
-- Per-instance revocation caches refresh every N seconds.
+- Per-instance revocation caches refresh on interval (for example every 10-30 seconds).
 - Network jitter or retries delay revocation propagation.
-- Services run with fail-open behavior when revocation backend is slow/unavailable.
-- Mixed fleet behavior during rolling deploys (some instances check denylist, some do not).
+- Services run fail-open when revocation backend is slow or unavailable.
+- Rolling deploys create mixed behavior across old/new auth middleware paths.
 
 ### Why It Appears at Scale
 
-At high QPS, teams optimize for low-latency JWT verification and minimize synchronous dependencies. That creates a split-brain auth model:
+At high QPS, teams optimize local verification to protect p95/p99 latency and reduce dependency blast radius. That creates split-brain auth:
 
-- token authenticity is checked synchronously
-- token liveness (revocation status) is checked asynchronously or inconsistently
+- Authenticity is checked synchronously (signature and claims).
+- Liveness is checked asynchronously or inconsistently (revocation status).
 
-Attackers exploit that timing window.
+Attackers exploit the consistency window between those two checks.
 
-## Attack/Abuse Flow
+## Attack and Replay Flow
 
 See `attack-flow.svg` (rendered) and `diagrams/attack-flow.mmd` (source).
 
@@ -77,79 +81,101 @@ See `sequence.svg` (rendered) and `diagrams/sequence.mmd` (source).
 
 Representative replay path:
 
-1. Attacker obtains a valid token (stolen device/session leak/log exposure).
-2. User logs out or security team revokes session.
+1. Attacker obtains a valid bearer token (device compromise, HAR leak, log exposure).
+2. User logs out or security team revokes the session.
 3. Revocation is written centrally.
-4. Attacker rapidly replays token against an instance with stale cache or fail-open path.
-5. Requests succeed until revocation is observed or token expires.
+4. Attacker rapidly replays the token against a stale instance.
+5. Requests continue until revocation converges or token expires.
+
+## Redis Consistency and Propagation Reality
+
+Revocation behavior depends on Redis design and integration style, not only Redis availability.
+
+Common patterns:
+
+- Single Redis lookup on every request: strongest consistency, higher latency and dependency pressure.
+- Local cache + periodic refresh: lower latency, explicit stale window.
+- Redis pub/sub invalidation + local cache: faster convergence, but sensitive to consumer lag and reconnect behavior.
+- Multi-region Redis replication: revocation windows widen during inter-region lag or failover.
+
+Operational pain points:
+
+- Cache TTL selected for latency can silently become security exposure budget.
+- Backpressure during incidents increases propagation delay exactly when revocation urgency is highest.
+- A temporary fail-open toggle can become a long-lived risk if not bounded by policy and alerting.
+
+## Token Replay Timeline Example
+
+| Time | Event | Service A (stale) | Service B (fresh) |
+| --- | --- | --- | --- |
+| `t0` | Token issued | Accept | Accept |
+| `t1` | Session revoked at IdP | Accept (cache not refreshed) | Reject (revocation applied) |
+| `t2` | Attacker replay burst | Accept some requests | Reject all requests |
+| `t3` | Cache/event convergence | Reject | Reject |
+
+The measurable risk is `t1 -> t3`: time-to-final-reject after revocation.
 
 ## Impact
 
 - Confidentiality: continued data access after logout or compromise handling.
-- Integrity: unauthorized state changes using nominally revoked identity.
-- Availability: revocation storms can overload centralized denylist checks if not designed for scale.
-- Blast radius: cross-service impact when shared token is accepted by multiple downstream services.
+- Integrity: unauthorized state changes under nominally revoked identity.
+- Availability: revocation storms can overload centralized checks if architecture is not load-shaped.
+- Blast radius: shared token acceptance across multiple services expands exposure surface.
 
 ## Detection Opportunities
 
-- Successful requests using tokens whose `jti` appears in revoke events.
-- Spikes in post-logout API activity per session or device fingerprint.
-- Instance-level divergence: one replica rejects while another accepts the same token.
-- Revocation latency SLO breach (time from revoke event to last accepted request).
+- Successful requests where `jti` appears in revoke events.
+- Spikes in post-logout activity by session/device fingerprint.
+- Instance divergence where one replica accepts and another rejects the same token.
+- Revocation SLO breach: elapsed time from revoke event to final reject.
 
 ## Mitigation Strategy
 
 See [mitigations.md](./mitigations.md).
 
-High-level direction:
+Practical strategy layers:
 
-- reduce revocation window with short-lived access tokens
-- standardize revocation enforcement via central introspection for sensitive routes
-- use push-based invalidation events and strict fail-closed policy for high-risk operations
+- Short access token TTL to bound replay window.
+- Centralized online liveness checks for high-risk operations.
+- Event-driven invalidation for fast multi-instance convergence.
+- Explicit policy on fail-open vs fail-closed by route risk class.
 
-## Common Anti-Patterns
+## Mitigation Tradeoffs (Engineering Reality)
 
-- Long-lived access tokens with weak session invalidation controls.
-- Best-effort cache refresh without revocation convergence SLOs.
-- Mixed fail-open and fail-closed behavior across services.
-- Revocation checks enforced only at gateway, not downstream high-risk services.
-
-## Mitigation Decision Matrix
-
-| Pattern | Security Gain | Latency Cost | Operational Complexity | Best Fit |
-| --- | --- | --- | --- | --- |
-| Short access-token TTL | Medium | Low | Low | Broad baseline hardening |
-| Central introspection on sensitive routes | High | Medium | Medium | High-value operations |
-| Event-driven revocation fan-out | High | Low-Medium | High | Large distributed fleets |
-| Session version checks | Medium-High | Medium | Medium | Stateful identity platforms |
-
-## Validation Scenarios
-
-1. Revoke token during sustained request replay and measure time-to-last-accept.
-2. Inject revocation-store latency and verify deterministic policy behavior.
-3. Test rolling deploy with mixed versions to ensure no bypass paths.
-4. Replay revoked tokens against every public and internal enforcement hop.
+| Control | Security Benefit | Latency / Cost | Typical Failure Mode |
+| --- | --- | --- | --- |
+| Very short access-token TTL | Reduces replay window | More refresh traffic | Refresh flow overload or UX friction |
+| Per-request introspection | Strong liveness guarantee | Added hop and dependency | Auth backend saturation during spikes |
+| Pub/sub invalidation | Fast convergence | Messaging complexity | Consumer lag, dropped subscriptions |
+| Local cache with TTL | Low request latency | Bounded stale window | Accept-after-revoke gap |
+| Fail-closed for critical routes | Strong containment | Potential availability impact | False positives during backend incident |
 
 ## Why Existing Systems Fail
 
-Teams usually do not ignore revocation risk intentionally. They optimize for latency, availability, and developer speed:
+Teams usually do not ignore revocation risk. They make rational local choices under pressure:
 
-- Offline JWT validation avoids network hops on hot paths.
-- Cache-based revocation checks reduce p99 latency and dependency blast radius.
-- Mixed fleets during deploys create temporary policy asymmetry.
-- Incident response demands immediate revocation, but distributed convergence is not instant.
+- Latency budgets push verification to local fast paths.
+- Availability goals discourage hard dependencies on control-plane systems.
+- Ownership boundaries split IdP, platform, and application enforcement behavior.
+- Incident pressure favors fast mitigations over architectural convergence guarantees.
 
-The result is a predictable consistency gap between control-plane revocation and data-plane acceptance.
+The result is a predictable consistency gap between control-plane intent and data-plane enforcement.
 
-## Real Incident Correlation
+## Real-World Incident Correlation
 
-Patterns in this case align with recurring real-world issues:
+This pattern aligns with recurring incident classes seen across the industry:
 
-- Stolen bearer tokens replayed before revocation converges across services.
-- Refresh-token abuse extending attacker session lifetime.
-- Session invalidation behaving inconsistently across mobile, web, and API surfaces.
+- Session token theft followed by replay before global invalidation converges.
+- OAuth/OIDC implementation mistakes where token lifecycle controls are uneven across services.
+- Support/log/HAR exposure events where valid tokens are reused within short windows.
 
-These incidents are less about JWT format and more about distributed session-state coordination.
+Public examples often discussed in security postmortems include:
+
+- Okta support-system breach discussions that highlighted session-token theft risk and replay urgency.
+- OAuth implementation-failure reports where token validation intent drift caused unintended acceptance.
+- CI/CD and identity-adjacent incidents (for example CircleCI token/session fallout patterns) reinforcing the need for rapid, consistent revocation paths.
+
+The architecture lesson is consistent: token compromise is inevitable; revocation convergence speed determines blast radius.
 
 ## Practical Demo
 

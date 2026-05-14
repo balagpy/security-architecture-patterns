@@ -1,0 +1,30 @@
+flowchart TB
+    subgraph B1[Boundary 1: Public to Edge]
+        U[User / Device]
+        G[Gateway]
+    end
+
+    subgraph B2[Boundary 2: Edge to Service Mesh]
+        S1[Service A]
+        S2[Service B]
+    end
+
+    subgraph B3[Boundary 3: Service to Identity State]
+        IDP[IdP]
+        RS[(Revocation State)]
+    end
+
+    U --> G
+    G --> S1
+    G --> S2
+    IDP --> RS
+    S1 --> RS
+    S2 --> RS
+
+    R1[Risk: token replay before state convergence]
+    R2[Risk: fail-open during revocation backend degradation]
+    R3[Risk: inconsistent policy across replicas]
+
+    S1 -.-> R1
+    S2 -.-> R2
+    RS -.-> R3

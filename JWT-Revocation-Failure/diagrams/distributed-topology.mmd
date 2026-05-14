@@ -1,0 +1,29 @@
+flowchart LR
+    subgraph Region1[Region A]
+        GW1[Gateway A]
+        SA1[Service A1]
+        SA2[Service A2]
+        RA[(Redis Replica A)]
+        GW1 --> SA1
+        GW1 --> SA2
+        SA1 --> RA
+        SA2 --> RA
+    end
+
+    subgraph Region2[Region B]
+        GW2[Gateway B]
+        SB1[Service B1]
+        SB2[Service B2]
+        RB[(Redis Replica B)]
+        GW2 --> SB1
+        GW2 --> SB2
+        SB1 --> RB
+        SB2 --> RB
+    end
+
+    IDP[Global IdP] --> RA
+    IDP --> RB
+    RA <--> RB
+
+    Note1[Cross-region replication lag widens revocation window]
+    RB -.-> Note1

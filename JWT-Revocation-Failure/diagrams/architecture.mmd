@@ -1,14 +1,47 @@
 flowchart LR
-    C[Client] --> G[API Gateway]
-    G --> A1[API Instance A]
-    G --> A2[API Instance B]
-    A1 --> R[(Redis Revocation Store)]
+    subgraph Internet[Untrusted Network]
+        C[Client App]
+        ATT[Attacker Replay Client]
+    end
+
+    subgraph Edge[Edge Trust Zone]
+        GW[API Gateway]
+    end
+
+    subgraph App[Service Trust Zone]
+        A1[Service Instance A]
+        A2[Service Instance B]
+        A3[Service Instance C]
+        LC1[(Local Revocation Cache A)]
+        LC2[(Local Revocation Cache B)]
+        LC3[(Local Revocation Cache C)]
+        A1 --> LC1
+        A2 --> LC2
+        A3 --> LC3
+    end
+
+    subgraph Identity[Identity Control Plane]
+        IDP[Auth Service / IdP]
+    end
+
+    subgraph Data[State Plane]
+        R[(Redis Revocation Store)]
+        PUB[(Event Bus / PubSub)]
+    end
+
+    C --> GW
+    GW --> A1
+    GW --> A2
+    GW --> A3
+
+    IDP --> R
+    IDP --> PUB
+
+    A1 --> R
     A2 --> R
-    IdP[Auth Service / IdP] --> G
-    IdP --> R
+    A3 --> R
+    PUB -. invalidation fan-out .-> A1
+    PUB -. invalidation fan-out .-> A2
+    PUB -. invalidation fan-out .-> A3
 
-    note1[Offline JWT signature validation at each API instance]
-    note2[Revocation state is centralized but read with different freshness]
-
-    A1 -. local stale cache .- note1
-    A2 -. local stale cache .- note2
+    ATT --> GW
