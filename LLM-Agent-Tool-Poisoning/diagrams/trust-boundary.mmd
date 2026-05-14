@@ -1,0 +1,28 @@
+flowchart TB
+    subgraph T1[Boundary 1: User Intent]
+        U[User]
+        ORCH[Orchestrator]
+    end
+
+    subgraph T2[Boundary 2: Untrusted Content]
+        RET[Retriever]
+        EXT[External Docs/Web]
+    end
+
+    subgraph T3[Boundary 3: Tool Execution]
+        LLM[Model]
+        POL[Policy Guard]
+        TOOLS[Tools]
+    end
+
+    U --> ORCH --> LLM
+    LLM --> RET --> EXT
+    LLM --> POL --> TOOLS
+
+    R1[Risk: untrusted text treated as instruction]
+    R2[Risk: over-privileged tool scope]
+    R3[Risk: missing decision provenance]
+
+    RET -.-> R1
+    TOOLS -.-> R2
+    POL -.-> R3

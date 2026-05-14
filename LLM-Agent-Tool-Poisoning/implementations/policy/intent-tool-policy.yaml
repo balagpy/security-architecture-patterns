@@ -1,0 +1,16 @@
+intents:
+  summarize_document:
+    allowed_tools:
+      - retrieval.read
+  analyze_logs:
+    allowed_tools:
+      - retrieval.read
+      - python.eval
+
+high_risk_tools:
+  - shell.exec
+  - filesystem.write
+  - network.post
+
+requirements:
+  step_up_approval_for_high_risk: true

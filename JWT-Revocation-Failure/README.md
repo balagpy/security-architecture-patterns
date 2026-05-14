@@ -186,6 +186,12 @@ Practical strategy layers:
 | Local cache with TTL | Low request latency | Bounded stale window | Accept-after-revoke gap |
 | Fail-closed for critical routes | Strong containment | Potential availability impact | False positives during backend incident |
 
+## When Not to Use a Pattern
+
+- Do not apply per-request introspection on all routes without throughput modeling and SLO guardrails.
+- Do not rely on short token TTL alone when compromise containment needs immediate revocation.
+- Do not deploy event-driven invalidation without delivery guarantees and lag observability.
+
 ## Why Existing Systems Fail
 
 Teams usually do not ignore revocation risk. They make rational local choices under pressure:
@@ -212,6 +218,15 @@ Public examples often discussed in security postmortems include:
 - CI/CD and identity-adjacent incidents (for example CircleCI token/session fallout patterns) reinforcing the need for rapid, consistent revocation paths.
 
 The architecture lesson is consistent: token compromise is inevitable; revocation convergence speed determines blast radius.
+
+## Implementation References
+
+Concrete implementation examples:
+
+- [Redis revocation key pattern](./implementations/redis/revocation-keys.md)
+- [High-risk introspection policy](./implementations/policy/high-risk-introspection.md)
+- [Revocation observability SLOs](./implementations/observability/revocation-slos.md)
+- [Replay test cases](./implementations/tests/replay-test-cases.md)
 
 ## Evidence
 

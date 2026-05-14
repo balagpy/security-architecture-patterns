@@ -1,0 +1,25 @@
+sequenceDiagram
+    participant U as User
+    participant R as Retriever
+    participant A as Agent
+    participant P as Policy
+    participant T as Tool
+
+    rect rgb(255,245,245)
+    Note over U,T: Before mitigation
+    U->>A: Summarize document
+    A->>R: Fetch context
+    R-->>A: Poisoned instruction text
+    A->>T: shell.exec command
+    T-->>A: Command output
+    end
+
+    rect rgb(245,255,245)
+    Note over U,T: After mitigation
+    U->>A: Summarize document
+    A->>R: Fetch context
+    R-->>A: Poisoned text
+    A->>P: Request shell.exec
+    P-->>A: Deny (intent-tool mismatch)
+    A-->>U: Safe fallback response
+    end

@@ -1,0 +1,18 @@
+flowchart LR
+    U[User Intent] --> ORCH[Orchestrator]
+    ORCH --> CLS[Intent Classifier]
+    ORCH --> RET[Retriever]
+    RET --> SAN[Context Sanitizer]
+    SAN --> LLM[Model]
+    LLM --> POL[Intent-to-Tool Policy]
+    POL --> APP[Approval Gate]
+    APP --> SBX[Sandboxed Tool Runtime]
+
+    AUD[Audit + Provenance Log] --> POL
+    AUD --> SBX
+
+    NOTE1[Untrusted retrieval never directly authorizes tools]
+    NOTE2[High-risk actions require step-up approval]
+
+    POL -.-> NOTE1
+    APP -.-> NOTE2

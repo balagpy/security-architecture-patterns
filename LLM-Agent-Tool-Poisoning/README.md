@@ -2,21 +2,22 @@
 
 ## Executive Summary
 
+Agentic systems become risky when untrusted content influences tool execution decisions. If retrieved text is treated as instruction context and tool scopes are broad, a single poisoned step can trigger high-impact actions.
 
-Agentic systems become risky when untrusted content can quietly influence tool execution. The model may treat retrieved text as instruction-like context, and if tooling permissions are broad, a single poisoned step can trigger high-impact actions.
-
-The weak point is usually orchestration policy, not model intelligence alone.
+In most cases, the weakness is orchestration policy design, not model capability alone.
 
 ## System Context
 
 Typical agent architecture:
-- orchestrator receives user goal
-- model reads mixed-trust context (user input, retrieved docs, external pages)
-- tool router selects and executes tools
-- results loop back to model for next actions
+
+- Orchestrator receives user goal and routes workflow.
+- Model processes mixed-trust context (user + retrieved content).
+- Tool router invokes capabilities based on model output.
+- Results feed back into iterative planning.
 
 Security invariant:
-- untrusted content must never become implicit authority for tool execution
+
+- Untrusted content must not directly authorize high-risk tool execution.
 
 ## Baseline Architecture
 
@@ -24,30 +25,63 @@ See `architecture.svg` (rendered) and `diagrams/architecture.mmd` (source).
 
 ![Architecture Diagram](./architecture.svg)
 
+## Trust Boundaries
+
+See `trust-boundary.svg` (rendered) and `diagrams/trust-boundary.mmd` (source).
+
+![Trust Boundary Diagram](./trust-boundary.svg)
+
+## Threat Model
+
+Trust assumptions:
+
+- User intent is known and mappable to permitted tool classes.
+- Retrieved content may be malicious, misleading, or instruction-injected.
+- Tool runtime requires explicit policy mediation before execution.
+
+Attacker capability assumptions:
+
+- Attacker can inject hostile content into retrieval sources.
+- Attacker can attempt to trigger tool escalation via prompt patterns.
+- Attacker can chain benign-looking steps toward high-risk operations.
+
+Failure conditions that matter:
+
+- Tool invocation allowed without intent-policy match.
+- High-risk tools executed without explicit approval.
+- Decision provenance missing for post-incident reconstruction.
+
 ## Normal Flow
 
 1. User submits objective.
-2. Agent retrieves context.
-3. Model proposes actions.
-4. Policy guard evaluates tool request.
-5. Approved tool executes with constrained scope.
+2. Agent retrieves context and classifies intent.
+3. Policy evaluates requested tool action against allowed tool set.
+4. High-risk actions require approval.
+5. Tool executes in constrained runtime with audit trail.
 
 ## Failure Modes
 
-1. Instruction injection from retrieved content
-- malicious text says "run shell command" or "exfiltrate secrets"
-- model follows as if system-authorized instruction
+1. Instruction injection from retrieved content.
 
-2. Over-broad tool permissions
-- agent has filesystem/network/tool access unrelated to current task
+- Retrieved text embeds malicious instructions.
+- Model treats data as policy authority.
 
-3. Missing intent-to-action policy binding
-- no explicit mapping from user intent to allowed tool classes
+2. Over-broad tool permissions.
 
-4. No provenance tracking
-- execution logs do not show which source content triggered tool call
+- Agent has access to high-impact tools by default.
+- Low-risk tasks can escalate into privileged actions.
 
-## Attack/Abuse Flow
+3. Missing intent-to-action binding.
+
+- No explicit mapping between user objective and tool class.
+- Tool decisions become prompt-shaped instead of policy-shaped.
+
+4. Weak provenance and auditability.
+
+- Tool call lacks source attribution and policy reasoning trace.
+- Incident response cannot reconstruct why action was allowed.
+
+## Attack and Abuse Flow
 
 See `attack-flow.svg` (rendered) and `diagrams/attack-flow.mmd` (source).
 
@@ -57,54 +91,98 @@ See `sequence.svg` (rendered) and `diagrams/sequence.mmd` (source).
 
 ![Sequence Diagram](./sequence.svg)
 
+## Before vs After Mitigation (Sequence Snapshot)
+
+See `before-after-sequence.svg` (rendered) and `diagrams/before-after-sequence.mmd` (source).
+
+![Before After Sequence](./before-after-sequence.svg)
+
 ## Impact
 
-- Confidentiality: secret/file exfiltration through tool calls.
-- Integrity: unauthorized modifications via command execution.
-- Availability: destructive or expensive tool loops.
-- Governance: inability to prove safe decision boundaries.
+- Confidentiality: sensitive file/data exfiltration through tool channels.
+- Integrity: unauthorized writes or command execution.
+- Availability: runaway loops and expensive tool misuse.
+- Governance: weak accountability for automated decisions.
 
 ## Detection Opportunities
 
-- tool calls whose justification text originates from untrusted retrieval chunks
-- sudden jumps to high-risk tools without prior explicit user authorization
-- deviations from expected tool-use policy per task type
-- anomalous high-privilege tool invocation patterns
+High-signal telemetry to instrument:
+
+- Tool requests where rationale originates in untrusted retrieval text.
+- High-risk tool call attempts from low-risk intent classes.
+- Approval-gate bypass or abnormal approval frequency spikes.
+- Policy-deny reason distributions by prompt and source domain.
+- Missing provenance fields in tool execution records.
+
+## Mitigation Architecture
+
+See `mitigation-architecture.svg` (rendered) and `diagrams/mitigation-architecture.mmd` (source).
+
+![Mitigation Architecture Diagram](./mitigation-architecture.svg)
 
 ## Mitigation Strategy
 
 See [mitigations.md](./mitigations.md).
 
+Practical strategy layers:
+
+- Enforce intent-to-tool allowlists.
+- Separate untrusted retrieval from instruction authority.
+- Require step-up approval for high-risk actions.
+- Run tools in least-privilege sandboxed runtime.
+
+## Mitigation Tradeoffs (Engineering Reality)
+
+| Control | Security Benefit | Latency / Cost | Typical Failure Mode |
+| --- | --- | --- | --- |
+| Intent-to-tool allowlists | High | Medium policy upkeep | Coverage gaps for new task classes |
+| Retrieval trust-tier separation | Medium-High | Prompt/runtime complexity | Misclassification of source trust |
+| Step-up approval gates | High | Human interaction delay | Approval fatigue / rubber-stamping |
+| Tool sandboxing + scoped creds | High | Infra overhead | Sandbox drift or over-broad scopes |
+
+## When Not to Use a Pattern
+
+- Do not allow unrestricted tool autonomy for low-risk UX convenience.
+- Do not add approval gates without user-experience tuning and ownership.
+- Do not rely on prompt-only defenses without runtime policy enforcement.
+
 ## Why Existing Systems Fail
 
+In practice, autonomy usually scales faster than safety controls:
 
-In practice, teams push autonomy before control maturity:
+- Teams optimize handoff reduction and response speed.
+- Retrieval and instruction contexts blur in implementation.
+- Policy models lag behind expanding tool surface area.
+- Audit and provenance design is deferred until after incidents.
 
-- Tool breadth is expanded to reduce human handoffs.
-- Retrieval context and instruction context are not strongly separated.
-- Policy checks are coarse and do not map tightly to user intent.
-- Logging captures outputs but misses decision provenance.
-
-That combination creates a path from convenience to compromise.
+The resulting posture is operationally useful, but security-fragile.
 
 ## Real Incident Correlation
 
-
-Public red-team work and incident reporting repeatedly show:
+Common incident classes and red-team findings align with this pattern:
 
 - Prompt injection leading to unintended tool calls.
 - Data exfiltration attempts through plugin/tool channels.
 - Workflow hijack patterns originating from untrusted retrieved content.
 
-The common failure mode is weak trust-tiering in the agent control plane.
+The recurring lesson is consistent: orchestrator policy and runtime controls determine blast radius.
+
+## Implementation References
+
+Concrete implementation examples:
+
+- [Intent-to-tool policy contract](./implementations/policy/intent-tool-policy.yaml)
+- [Tool runtime sandbox controls](./implementations/sandbox/runtime-controls.md)
+- [Step-up approval flow](./implementations/approval/step-up-flow.md)
+- [Red-team test cases](./implementations/tests/red-team-cases.md)
 
 ## Evidence
 
 Signals to collect for validation:
 
-- Metrics: `time-to-final-reject`, `policy-deny-rate`, and cross-replica decision divergence.
-- Logs: identity context, enforcement path, and reason code for allow/deny decisions.
-- Tests: replay, propagation-delay, and failover behavior under sustained load.
+- Metrics: policy-deny rate by intent, high-risk request rate, approval override rate.
+- Logs: source trust tier, requested tool, decision reason code, approval actor.
+- Tests: prompt-injection replay, escalation attempts, approval bypass simulations.
 
 ## Practical Demo
 
@@ -113,13 +191,11 @@ Companion demo:
 - [llm-agent-tool-poisoning-lab](../demo/llm-agent-tool-poisoning-lab/README.md)
 - [Run script](../demo/llm-agent-tool-poisoning-lab/run-demo.sh)
 
-
 ## Known Limitations
 
-
-- The demo abstracts away model-specific guardrail differences.
-- It does not model full enterprise approval workflows or human-in-the-loop escalations.
-- Production safety needs layered controls across prompting, policy, runtime, and audit.
+- Demo abstracts provider-specific guardrail implementations.
+- It does not model full enterprise workflow/approval systems.
+- Production safety requires layered controls across prompt, policy, runtime, and audit planes.
 
 ## References
 
