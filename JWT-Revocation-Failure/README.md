@@ -9,12 +9,14 @@ This gap is not a cryptographic failure. It is an architecture consistency failu
 ## System Context
 
 Typical system architecture:
+
 - identity provider issues short-lived access tokens and longer-lived refresh tokens
 - API gateway forwards bearer tokens to multiple backend services
 - services validate JWTs locally using issuer keys
 - revocation state is stored in Redis or similar KV store and optionally copied into per-instance memory caches
 
 Trust model:
+
 - signed JWT is trusted as authentic
 - revocation store is trusted as the source of session invalidation truth
 - each service instance is trusted to enforce revocation uniformly
@@ -57,6 +59,7 @@ Core components:
 ### Why It Appears at Scale
 
 At high QPS, teams optimize for low-latency JWT verification and minimize synchronous dependencies. That creates a split-brain auth model:
+
 - token authenticity is checked synchronously
 - token liveness (revocation status) is checked asynchronously or inconsistently
 
@@ -73,6 +76,7 @@ See `sequence.svg` (rendered) and `diagrams/sequence.mmd` (source).
 ![Sequence Diagram](./sequence.svg)
 
 Representative replay path:
+
 1. Attacker obtains a valid token (stolen device/session leak/log exposure).
 2. User logs out or security team revokes session.
 3. Revocation is written centrally.
@@ -98,6 +102,7 @@ Representative replay path:
 See [mitigations.md](./mitigations.md).
 
 High-level direction:
+
 - reduce revocation window with short-lived access tokens
 - standardize revocation enforcement via central introspection for sensitive routes
 - use push-based invalidation events and strict fail-closed policy for high-risk operations
@@ -128,6 +133,7 @@ High-level direction:
 ## Why Existing Systems Fail
 
 Teams usually do not ignore revocation risk intentionally. They optimize for latency, availability, and developer speed:
+
 - Offline JWT validation avoids network hops on hot paths.
 - Cache-based revocation checks reduce p99 latency and dependency blast radius.
 - Mixed fleets during deploys create temporary policy asymmetry.
@@ -138,6 +144,7 @@ The result is a predictable consistency gap between control-plane revocation and
 ## Real Incident Correlation
 
 Patterns in this case align with recurring real-world issues:
+
 - Stolen bearer tokens replayed before revocation converges across services.
 - Refresh-token abuse extending attacker session lifetime.
 - Session invalidation behaving inconsistently across mobile, web, and API surfaces.
@@ -147,6 +154,7 @@ These incidents are less about JWT format and more about distributed session-sta
 ## Practical Demo
 
 Runnable companion demo:
+
 - [jwt-revocation-lab](../demo/jwt-revocation-lab/README.md)
 
 ## References

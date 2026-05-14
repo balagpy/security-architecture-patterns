@@ -9,6 +9,7 @@ This index maps architecture failures to reusable security design patterns.
 - Stale enforcement windows across replicas.
 
 Case study:
+
 - [JWT Revocation Failure](./JWT-Revocation-Failure/README.md)
 
 ## Tenant and Data Boundary Integrity
@@ -18,6 +19,7 @@ Case study:
 - Boundary collapse under shared infrastructure.
 
 Case study:
+
 - [Multi-Tenant SaaS Isolation](./Multi-Tenant-SaaS-Isolation/README.md)
 
 ## Trust Boundary and Identity Propagation
@@ -27,6 +29,7 @@ Case study:
 - Direct backend exposure outside policy path.
 
 Case study:
+
 - [API Gateway Trust Boundaries](./API-Gateway-Trust-Boundaries/README.md)
 
 ## OAuth and Token Intent Integrity
@@ -36,6 +39,7 @@ Case study:
 - Weak issuer/scope/claim enforcement.
 
 Case study:
+
 - [OAuth Token Confusion](./OAuth-Token-Confusion/README.md)
 
 ## Software Supply Chain Trust
@@ -45,6 +49,7 @@ Case study:
 - Missing artifact provenance verification.
 
 Case study:
+
 - [CI/CD Supply Chain Risk](./CI-CD-Supply-Chain-Risk/README.md)
 
 ## Agentic AI Tooling Trust
@@ -54,6 +59,7 @@ Case study:
 - Missing intent-to-tool policy bindings.
 
 Case study:
+
 - [LLM Agent Tool Poisoning](./LLM-Agent-Tool-Poisoning/README.md)
 
 ## Zero Trust Runtime Reality
@@ -63,6 +69,7 @@ Case study:
 - Stale exceptions and policy-to-runtime drift.
 
 Case study:
+
 - [Zero Trust Architecture Mistakes](./Zero-Trust-Architecture-Mistakes/README.md)
 
 ## Operational Design Checklist

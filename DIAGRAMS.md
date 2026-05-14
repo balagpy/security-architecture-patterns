@@ -5,12 +5,14 @@ Repository standard is Mermaid source + SVG render output.
 ## Per Case Study
 
 Required files:
+
 - `diagrams/architecture.mmd`
 - `diagrams/attack-flow.mmd`
 - `architecture.svg`
 - `attack-flow.svg`
 
 Notes:
+
 - Mermaid (`.mmd`) is the editable source of truth.
 - SVG is the publication artifact for README viewing and sharing.
 - PNG is optional and only needed for platforms that cannot render SVG.
