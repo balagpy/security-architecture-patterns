@@ -1,0 +1,10 @@
+sequenceDiagram
+    participant Att as Attacker
+    participant A as Service A
+    participant R as Redis
+
+    Att->>A: Replay stolen token
+    A->>A: Validate signature + exp
+    A->>A: Stale local cache says not revoked
+    A-->>Att: 200 OK
+    A->>R: Later refresh revocation state

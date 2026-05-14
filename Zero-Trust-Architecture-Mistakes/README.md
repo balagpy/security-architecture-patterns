@@ -91,10 +91,27 @@ These failure patterns correlate with common enterprise incidents:
 
 Real progress depends on continuous runtime verification, not perimeter declarations.
 
+## Evidence
+
+Signals to collect for validation:
+
+- Metrics: `time-to-final-reject`, `policy-deny-rate`, and cross-replica decision divergence.
+- Logs: identity context, enforcement path, and reason code for allow/deny decisions.
+- Tests: replay, propagation-delay, and failover behavior under sustained load.
+
 ## Practical Demo
 
 Companion demo:
+
 - [zero-trust-mistakes-lab](../demo/zero-trust-mistakes-lab/README.md)
+- [Run script](../demo/zero-trust-mistakes-lab/run-demo.sh)
+
+
+## Known Limitations
+
+- Demonstrations simplify production controls and omit organization-specific policy layers.
+- Timing windows and failure behavior vary by deployment topology and traffic patterns.
+- Mitigations reduce risk but do not eliminate compromised-token or insider-abuse classes entirely.
 
 ## References
 

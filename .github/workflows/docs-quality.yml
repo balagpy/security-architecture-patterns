@@ -1,0 +1,38 @@
+name: docs-quality
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate markdown links
+        uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with:
+          use-quiet-mode: 'yes'
+          config-file: '.mlc-config.json'
+
+      - name: Validate required case-study files
+        run: |
+          set -euo pipefail
+          topics=(
+            JWT-Revocation-Failure
+            Multi-Tenant-SaaS-Isolation
+            API-Gateway-Trust-Boundaries
+            OAuth-Token-Confusion
+            CI-CD-Supply-Chain-Risk
+            LLM-Agent-Tool-Poisoning
+            Zero-Trust-Architecture-Mistakes
+          )
+
+          required=(README.md architecture.svg attack-flow.svg sequence.svg mitigations.md references.md diagrams/architecture.mmd diagrams/attack-flow.mmd diagrams/sequence.mmd)
+
+          for t in "${topics[@]}"; do
+            for r in "${required[@]}"; do
+              test -f "$t/$r" || { echo "Missing: $t/$r"; exit 1; }
+            done
+          done

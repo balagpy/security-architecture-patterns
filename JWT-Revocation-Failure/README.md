@@ -149,6 +149,16 @@ The measurable risk is `t1 -> t3`: time-to-final-reject after revocation.
 - Instance divergence where one replica accepts and another rejects the same token.
 - Revocation SLO breach: elapsed time from revoke event to final reject.
 
+## Before vs After Mitigation (Sequence Snapshot)
+
+Before mitigation:
+
+![Before Mitigation Sequence](./sequence-before.svg)
+
+After mitigation:
+
+![After Mitigation Sequence](./sequence-after.svg)
+
 ## Mitigation Architecture
 
 See `mitigation-architecture.svg` (rendered) and `diagrams/mitigation-architecture.mmd` (source).
@@ -203,11 +213,27 @@ Public examples often discussed in security postmortems include:
 
 The architecture lesson is consistent: token compromise is inevitable; revocation convergence speed determines blast radius.
 
+## Evidence
+
+Signals to collect for validation:
+
+- Metrics: `time-to-final-reject`, `policy-deny-rate`, and cross-replica decision divergence.
+- Logs: identity context, enforcement path, and reason code for allow/deny decisions.
+- Tests: replay, propagation-delay, and failover behavior under sustained load.
+
 ## Practical Demo
 
 Runnable companion demo:
 
 - [jwt-revocation-lab](../demo/jwt-revocation-lab/README.md)
+- [Run script](../demo/jwt-revocation-lab/run-demo.sh)
+
+
+## Known Limitations
+
+- Demonstrations simplify production controls and omit organization-specific policy layers.
+- Timing windows and failure behavior vary by deployment topology and traffic patterns.
+- Mitigations reduce risk but do not eliminate compromised-token or insider-abuse classes entirely.
 
 ## References
 

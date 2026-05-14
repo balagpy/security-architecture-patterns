@@ -1,6 +1,15 @@
 # security-architecture-patterns
 
+![License: MIT](https://img.shields.io/badge/License-MIT-green.svg) ![Focus: Security Architecture](https://img.shields.io/badge/Focus-Security%20Architecture-blue) ![Diagrams: SVG](https://img.shields.io/badge/Diagrams-SVG-orange)
+
 Security architecture research repository focused on how modern systems fail at scale and how to design resilient, measurable mitigations.
+
+## Start Here
+
+1. Read [METHODOLOGY.md](./METHODOLOGY.md) for analysis standards.
+2. Start with [JWT Revocation Failure](./JWT-Revocation-Failure/README.md) as the flagship deep-dive.
+3. Use [PATTERN-INDEX.md](./PATTERN-INDEX.md) to navigate cross-topic patterns.
+4. Run companion demonstrations from [demo/](./demo/).
 
 ## Repository Scope
 

@@ -1,0 +1,11 @@
+sequenceDiagram
+    participant Att as Attacker
+    participant A as Service A
+    participant INT as Introspection
+    participant BUS as Revocation Bus
+
+    BUS-->>A: Revoke event invalidates local cache
+    Att->>A: Replay stolen token
+    A->>INT: Online check for high-risk route
+    INT-->>A: revoked=true
+    A-->>Att: 401 Revoked

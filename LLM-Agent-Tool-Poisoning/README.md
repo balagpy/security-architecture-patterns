@@ -93,10 +93,27 @@ Observed incidents and public red-team findings commonly involve:
 
 The recurring issue is orchestration trust design, not model capability alone.
 
+## Evidence
+
+Signals to collect for validation:
+
+- Metrics: `time-to-final-reject`, `policy-deny-rate`, and cross-replica decision divergence.
+- Logs: identity context, enforcement path, and reason code for allow/deny decisions.
+- Tests: replay, propagation-delay, and failover behavior under sustained load.
+
 ## Practical Demo
 
 Companion demo:
+
 - [llm-agent-tool-poisoning-lab](../demo/llm-agent-tool-poisoning-lab/README.md)
+- [Run script](../demo/llm-agent-tool-poisoning-lab/run-demo.sh)
+
+
+## Known Limitations
+
+- Demonstrations simplify production controls and omit organization-specific policy layers.
+- Timing windows and failure behavior vary by deployment topology and traffic patterns.
+- Mitigations reduce risk but do not eliminate compromised-token or insider-abuse classes entirely.
 
 ## References
 

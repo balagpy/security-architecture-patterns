@@ -92,10 +92,27 @@ This pattern maps to well-known classes of incidents:
 
 The recurring theme is control inconsistency across API, cache, worker, and data paths.
 
+## Evidence
+
+Signals to collect for validation:
+
+- Metrics: `time-to-final-reject`, `policy-deny-rate`, and cross-replica decision divergence.
+- Logs: identity context, enforcement path, and reason code for allow/deny decisions.
+- Tests: replay, propagation-delay, and failover behavior under sustained load.
+
 ## Practical Demo
 
 Companion demo:
+
 - [multi-tenant-isolation-lab](../demo/multi-tenant-isolation-lab/README.md)
+- [Run script](../demo/multi-tenant-isolation-lab/run-demo.sh)
+
+
+## Known Limitations
+
+- Demonstrations simplify production controls and omit organization-specific policy layers.
+- Timing windows and failure behavior vary by deployment topology and traffic patterns.
+- Mitigations reduce risk but do not eliminate compromised-token or insider-abuse classes entirely.
 
 ## References
 
