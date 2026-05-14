@@ -1,0 +1,35 @@
+flowchart TB
+    subgraph B1[Boundary 1: User and Device Access]
+        U[User/Device]
+        IDP[Identity + MFA]
+    end
+
+    subgraph B2[Boundary 2: App and Service Access]
+        GW[App Gateway]
+        SA[Service A]
+        SB[Service B]
+    end
+
+    subgraph B3[Boundary 3: Data and Policy Plane]
+        DB[(Data Store)]
+        PE[Policy Engine]
+        WI[Workload Identity]
+    end
+
+    U --> IDP
+    IDP --> GW
+    GW --> SA
+    SA --> SB
+    SB --> DB
+    PE --> SA
+    PE --> SB
+    WI --> SA
+    WI --> SB
+
+    R1[Risk: perimeter-only trust]
+    R2[Risk: implicit east-west trust]
+    R3[Risk: stale policy exceptions]
+
+    GW -.-> R1
+    SA -.-> R2
+    PE -.-> R3

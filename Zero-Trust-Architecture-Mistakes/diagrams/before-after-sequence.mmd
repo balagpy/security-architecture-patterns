@@ -1,0 +1,23 @@
+sequenceDiagram
+    participant Att as Attacker Foothold
+    participant SA as Service A
+    participant SB as Service B
+    participant Policy as Policy + Identity Layer
+
+    rect rgb(255,245,245)
+    Note over Att,SB: Before mitigation
+    Att->>SA: Compromise low-trust workload
+    SA->>SB: Internal call (implicit trust)
+    SB-->>SA: 200 allowed
+    end
+
+    rect rgb(245,255,245)
+    Note over Att,Policy: After mitigation
+    Att->>SA: Compromise low-trust workload
+    SA->>Policy: Present workload identity
+    Policy-->>SA: Limited scope only
+    SA->>SB: Attempt privileged call
+    SB->>Policy: Verify caller identity + policy
+    Policy-->>SB: deny
+    SB-->>SA: 403 denied
+    end

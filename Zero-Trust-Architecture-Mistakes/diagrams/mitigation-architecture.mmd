@@ -1,0 +1,20 @@
+flowchart LR
+    U[User/Device] --> ID[Identity + Device Posture]
+    ID --> G[Gateway]
+    G --> S1[Service A]
+    S1 --> S2[Service B]
+    S2 --> D[(Data Store)]
+
+    WI[Workload Identity + mTLS] --> S1
+    WI --> S2
+    PDP[Central Policy Decision] --> S1
+    PDP --> S2
+    PEP[Local Policy Enforcement] --> S1
+    PEP --> S2
+    EX[Exception Registry with TTL] --> PDP
+
+    NOTE1[No implicit trust by network location]
+    NOTE2[Every hop re-evaluates identity and policy]
+
+    WI -.-> NOTE1
+    PDP -.-> NOTE2

@@ -1,0 +1,12 @@
+required_signals:
+  - caller_workload_identity
+  - user_or_workload_risk_score
+  - requested_action
+  - resource_sensitivity
+
+decision_rules:
+  default: deny
+  allow_if:
+    - identity_verified
+    - policy_match
+    - context_within_risk_threshold
